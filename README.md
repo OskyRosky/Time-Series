@@ -71,7 +71,7 @@ The popularity of time series analysis stems from its ability to provide valuabl
 
 The impact of time series analysis on society is significant: it helps businesses stay competitive, enables policymakers to plan effectively, and assists individuals in making data-driven decisions. From improving financial investment strategies to predicting climate changes, time series analysis plays a pivotal role in shaping our world.
 
- ## 2. Why is Time Series Analysis important?
+ ## 2. Why is Time Series analysis important?
 
 ### Identifying Trends and Patterns
 
