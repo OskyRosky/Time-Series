@@ -2,7 +2,7 @@
 
 Everything about time series (TS)
 
- ![ut](/ima/ima1.webp)
+ ![ut](/ima/ima1.png)
 
 ---------------------------------------------
 
