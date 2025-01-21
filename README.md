@@ -132,3 +132,5 @@ Environmental Time Series: Techniques focused on analyzing climate data, air pol
 Healthcare Time Series: Specialized approaches for monitoring patient health metrics and predicting disease progression to improve medical interventions.
 
 # II. Time series tools
+
+# III. Time series methodology.
