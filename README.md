@@ -523,7 +523,32 @@ Productivity trend analysis
 Training effectiveness measurement over time
 Compensation and benefits trend forecasting
 
-
 # V. Time series methodology.
+
+## Steps 
+
+## 1. Understanding and data collection. 
+
+## 2. Data preprocessing.
+
+## 3. Exploratory data analysis (EDA).
+
+## 4. Anomaly Detection
+
+## 5. Decomposition of Time Series.
+
+## 6. Model selection.
+
+## 7. Model Training and Evaluation
+
+## 8. Fine tuning
+
+## 9. Forecasting and interpretation
+
+## 10. Scenario and sensitivity analysis
+
+## 11. Deployment and monitoring
+
+## 12. Reporting and decision-making
 
 # V. Time series applications.
