@@ -267,6 +267,68 @@ These solutions offer a wide range of functionalities from data ingestion to vis
 
 # III. Uses of Time Series analysis.
 
+## 1. Descriptive Analysis
+Descriptive time series analysis focuses on understanding historical data patterns and extracting key insights. Its main uses include:
+
+Trend identification: detecting upward or downward patterns over time.
+Seasonality detection: identifying recurring cycles or periodic patterns (e.g., sales spikes during holidays).
+Cyclic pattern analysis: studying fluctuations that occur at irregular intervals, such as economic cycles.
+Time series decomposition: breaking down data into trend, seasonal, and residual components for better interpretation.
+Variability analysis: measuring dispersion and stability of the series over time.
+Anomaly detection: identifying outliers that may indicate unexpected events or data issues.
+Autocorrelation analysis: evaluating how a variable relates to itself over different time intervals to determine temporal dependencies.
+
+##  2. Diagnostic Analysis
+
+This type of analysis helps understand the reasons behind observed behaviors in the time series. Its applications include:
+
+Identifying driving factors: discovering which external variables influence the time series (e.g., the impact of weather on energy demand).
+Temporal causality: determining if past events influence future values using methods like Granger causality.
+Seasonality and calendar effects: analyzing the impact of specific events such as holidays or seasonal changes.
+Comparing multiple time series: studying relationships between different time series to identify correlations and dependencies.
+
+## 3. Predictive Analysis (Forecasting)
+
+Predictive analysis uses models to estimate future values based on historical data. Its primary applications include:
+
+Short-, medium-, and long-term forecasting: predicting future values over different time horizons.
+Trend projection models: using models such as ARIMA, SARIMA, or Prophet to extrapolate trends into the future.
+Point and probabilistic forecasting: estimating specific values and confidence intervals.
+Scenario forecasting: modeling different outcomes based on external variables (e.g., optimistic vs. pessimistic scenarios).
+Inventory and resource optimization: estimating future demand to efficiently manage supplies.
+
+##  4. Seasonality and Cyclicality Analysis
+
+Identifying high and low demand seasons: helping businesses make strategic decisions during key periods.
+Seasonal adjustment: removing seasonal components for more precise analysis.
+Modeling recurring patterns: useful in industries with regular production or consumption cycles.
+
+## 5. Intervention Analysis
+
+Evaluating the impact of an event or policy on the time series, such as the launch of a product or regulatory changes.
+Comparing periods before and after an intervention to assess effectiveness.
+
+##  6. Persistence and Volatility Analysis
+
+Measuring how long the effects of a change persist in the time series.
+Evaluating volatility to understand system stability (commonly used in finance, climate, and economics).
+
+##  7. Modeling Temporal Dependencies
+
+Using autoregressive models to capture dependencies between past and present values.
+Evaluating long-term memory effects to determine if the data shows persistent patterns over time.
+
+##  8. Noise Reduction and Data Smoothing
+
+Applying techniques such as moving averages, exponential smoothing, and signal filtering to remove random fluctuations and highlight underlying patterns.
+
+## 9. Stability and Regime Change Evaluation
+Detecting structural changes in the data to identify moments when the system’s dynamics change significantly.
+
+##  10. Temporal Correlation Analysis Between Variables
+
+Determining how one time series influences another over time through cross-correlation techniques.
+
 # IV. Time series methodology.
 
 # V. Time series applications.
