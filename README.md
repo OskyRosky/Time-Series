@@ -1,4 +1,4 @@
-# Time Series
+nh         uy7# Time Series
 
 Everything about time series (TS)
 
@@ -132,6 +132,54 @@ Environmental Time Series: Techniques focused on analyzing climate data, air pol
 Healthcare Time Series: Specialized approaches for monitoring patient health metrics and predicting disease progression to improve medical interventions.
 
 # II. Time series tools
+
+## Python libraries for Time Series analysis
+
+### Pandas 
+
+Provides powerful data structures to manipulate time series data, offering functionalities like resampling, rolling window calculations, and time-based indexing.
+
+### NumPy
+
+Essential for handling numerical operations in time series data, offering efficient array processing capabilities.
+
+### Statsmodels
+
+Offers statistical modeling capabilities, including ARIMA, exponential smoothing, and seasonal decomposition for time series analysis.
+
+### Scikit-learn
+
+Provides machine learning tools such as regression models and ensemble methods that can be applied to time series forecasting.
+
+### TensorFlow/Keras 
+
+Deep learning frameworks that enable building LSTM and CNN models for advanced forecasting tasks.
+
+### PyTorch
+
+Another deep learning framework widely used for developing recurrent neural networks tailored for time series applications.
+
+### Prophet
+
+Developed by Facebook, it simplifies the forecasting process by automatically detecting trends and seasonality in time series data.
+
+### Darts
+
+A comprehensive framework that supports traditional and deep learning models, providing an easy-to-use interface for time series forecasting.
+
+### TSFresh
+
+Extracts relevant features from time series data, enabling automated feature engineering for machine learning models.
+
+### PyFlux
+
+A library focused on Bayesian time series modeling, offering flexibility in handling complex probabilistic models.
+
+### Luminol
+
+A tool for anomaly detection and correlation in time series data, useful in monitoring applications.
+
+I think these libraries cover a wide range of functionalities, from simple preprocessing to complex forecasting, allowing users to select the right tools depending on their specific needs.
 
 # III. Time series methodology.
 
