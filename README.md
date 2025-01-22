@@ -181,6 +181,48 @@ A tool for anomaly detection and correlation in time series data, useful in moni
 
 I think these libraries cover a wide range of functionalities, from simple preprocessing to complex forecasting, allowing users to select the right tools depending on their specific needs.
 
+## R Libraries for Time Series Analysis
+
+### forecast 
+
+One of the most popular packages, providing functions for ARIMA, exponential smoothing, and state space models.
+
+### tseries
+
+Offers various statistical tests and models for time series analysis, including unit root tests and GARCH models.
+
+### prophet
+
+Similar to the Python version, this package simplifies time series forecasting by automatically handling trends and seasonality.
+
+### zoo 
+
+Provides infrastructure for handling irregular time series data with powerful manipulation functions.
+
+### xts
+
+An extension of zoo, specifically designed for financial time series analysis.
+
+### fable 
+
+A modern framework that provides tools for forecasting with tidy data principles.
+
+### TSclust
+
+Offers methods for clustering time series data based on different distance measures and features.
+
+### lubridate
+
+Facilitates working with dates and times, making it easier to manipulate temporal data.
+
+### anomalize
+
+A package designed to detect anomalies in time series data using decomposition and machine learning techniques.
+
+These R libraries offer a diverse range of tools for handling, analyzing, and visualizing time series data, from traditional statistical methods to modern machine learning-based approaches.
+
+
+
 # III. Time series methodology.
 
 # IV. Time series applications.
