@@ -355,41 +355,41 @@ Use Cases:
 
 Use Cases:
 
-Patient health monitoring (heart rate, blood pressure)
-Disease outbreak forecasting (e.g., flu trends)
-Hospital resource allocation (beds, staff, medical supplies)
-Drug sales and consumption prediction
-Wearable device data analysis for long-term health trends
+- Patient health monitoring (heart rate, blood pressure)
+- Disease outbreak forecasting (e.g., flu trends)
+- Hospital resource allocation (beds, staff, medical supplies)
+- Drug sales and consumption prediction
+- Wearable device data analysis for long-term health trends
 
 ## 4. Energy and Utilities
 
 Use Cases:
 
-Electricity load forecasting
-Renewable energy production prediction (solar, wind)
-Power grid optimization and fault detection
-Consumption trend analysis
-Energy price forecasting based on demand and supply
+- Electricity load forecasting
+- Renewable energy production prediction (solar, wind)
+- Power grid optimization and fault detection
+- Consumption trend analysis
+- Energy price forecasting based on demand and supply
 
 ## 5. Transportation and Logistics
 
 Use Cases:
 
-Traffic flow prediction
-Fleet maintenance scheduling
-Delivery time estimation and route optimization
-Airline demand forecasting
-Public transportation scheduling and optimization
+- Traffic flow prediction
+- Fleet maintenance scheduling
+- Delivery time estimation and route optimization
+- Airline demand forecasting
+- Public transportation scheduling and optimization
 
 ## 6. Manufacturing
 
 Use Cases:
 
-Predictive maintenance of machinery
-Production line optimization based on demand
-Quality control monitoring over time
-Supply chain planning and inventory forecasting
-Equipment failure prediction using sensor data
+- Predictive maintenance of machinery
+- Production line optimization based on demand
+- Quality control monitoring over time
+- Supply chain planning and inventory forecasting
+- Equipment failure prediction using sensor data
 
 ## 7. Environmental Science
 
