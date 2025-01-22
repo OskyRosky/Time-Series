@@ -221,8 +221,52 @@ A package designed to detect anomalies in time series data using decomposition a
 
 These R libraries offer a diverse range of tools for handling, analyzing, and visualizing time series data, from traditional statistical methods to modern machine learning-based approaches.
 
+## Existing solutions for Time Series analysis
 
+### Google Cloud AI Platform
 
-# III. Time series methodology.
+Offers advanced time series forecasting models with automated feature engineering and scalable cloud infrastructure.
 
-# IV. Time series applications.
+### AWS Forecast
+
+A fully managed service that uses machine learning to deliver highly accurate forecasts based on time series data.
+
+### Microsoft Azure Time Series Insights
+
+A comprehensive analytics solution for managing, analyzing, and visualizing time series data at scale.
+
+### Tableau
+
+A powerful visualization tool that provides built-in time series analysis features for trend analysis and forecasting.
+
+### Power BI
+
+Microsoft's business analytics service that allows users to analyze and visualize time series data with ease.
+
+### RapidMiner
+
+An end-to-end data science platform with capabilities for time series forecasting using machine learning and statistical models.
+
+### TIBCO Spotfire
+
+A data visualization and analytics platform with extensive time series analysis capabilities.
+
+### Qlik Sense
+
+A self-service analytics tool that offers powerful visual exploration of time series data.
+
+### Alteryx
+
+Provides data preparation and advanced analytics capabilities, including time series forecasting tools.
+
+### IBM SPSS Modeler
+
+A predictive analytics platform that includes time series forecasting as part of its extensive analytical toolkit.
+
+These solutions offer a wide range of functionalities from data ingestion to visualization and forecasting, making them suitable for businesses and researchers looking to leverage time series analysis without extensive programming knowledge.
+
+# III. Uses of Time Series analysis.
+
+# IV. Time series methodology.
+
+# V. Time series applications.
