@@ -555,35 +555,35 @@ Data collection is the first and one of the most critical steps in time series a
 
 Time series data can be obtained from various sources, each offering unique advantages and challenges:
 
-Sensors and IoT devices: these devices continuously generate data in industries such as healthcare, manufacturing, and environmental monitoring. they provide real-time data with high granularity.
+- Sensors and IoT devices: these devices continuously generate data in industries such as healthcare, manufacturing, and environmental monitoring. they provide real-time data with high granularity.
 
-Financial markets: stock exchanges, banks, and trading platforms provide financial time series data related to stock prices, interest rates, and currency exchange rates.
+- Financial markets: stock exchanges, banks, and trading platforms provide financial time series data related to stock prices, interest rates, and currency exchange rates.
 
-Government and public agencies: institutions often release datasets related to demographics, economic indicators, weather conditions, and energy consumption.
+- Government and public agencies: institutions often release datasets related to demographics, economic indicators, weather conditions, and energy consumption.
 
-Web and social media: platforms like Twitter, Google Trends, and website analytics tools provide time-stamped user engagement metrics and sentiment analysis data.
+- Web and social media: platforms like Twitter, Google Trends, and website analytics tools provide time-stamped user engagement metrics and sentiment analysis data.
 
-Enterprise systems: internal company databases, ERP systems, and CRM platforms store operational data such as sales figures, employee productivity, and supply chain information.
+- Enterprise systems: internal company databases, ERP systems, and CRM platforms store operational data such as sales figures, employee productivity, and supply chain information.
 
-Manual data collection: some data must be collected manually, such as survey responses or historical records that are not digitized.
+- Manual data collection: some data must be collected manually, such as survey responses or historical records that are not digitized.
 
 ### Common Data Formats
 
 Once the data is collected, it is usually available in various formats that facilitate processing and analysis:
 
-CSV (Comma-Separated Values): widely used due to its simplicity and compatibility with most tools.
+- CSV (Comma-Separated Values): widely used due to its simplicity and compatibility with most tools.
 
-JSON (JavaScript Object Notation): often used for web-based data, providing flexibility in structuring time series records.
+- JSON (JavaScript Object Notation): often used for web-based data, providing flexibility in structuring time series records.
 
-Excel files (XLSX): commonly used in business environments for storing and sharing time series data.
+- Excel files (XLSX): commonly used in business environments for storing and sharing time series data.
 
-SQL databases: structured databases such as PostgreSQL and MySQL allow efficient querying and storage of large time series datasets.
+- SQL databases: structured databases such as PostgreSQL and MySQL allow efficient querying and storage of large time series datasets.
 
-NoSQL databases: databases like MongoDB and Cassandra offer flexibility for handling unstructured or semi-structured time series data.
+- NoSQL databases: databases like MongoDB and Cassandra offer flexibility for handling unstructured or semi-structured time series data.
 
-Parquet/ORC files: optimized for performance and storage efficiency in big data environments.
+- Parquet/ORC files: optimized for performance and storage efficiency in big data environments.
 
-Real-time streams: formats such as Apache Kafka and MQTT support real-time data processing from sensors and logs.
+- Real-time streams: formats such as Apache Kafka and MQTT support real-time data processing from sensors and logs.
 
 ### Data Storage Options
 
