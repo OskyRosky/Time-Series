@@ -629,25 +629,25 @@ Exploratory Data Analysis (EDA) is a crucial step in time series analysis that h
 
 EDA for time series involves several key analyses:
 
-- Visualization of the time series: plotting the data over time allows us to observe general trends, seasonal patterns, and potential anomalies. common visualizations include line plots, scatter plots, and heatmaps to detect changes over different time frames.
+- **Visualization of the time series**: plotting the data over time allows us to observe general trends, seasonal patterns, and potential anomalies. common visualizations include line plots, scatter plots, and heatmaps to detect changes over different time frames.
 
-- Trend analysis: identifying whether the series exhibits an increasing or decreasing trend over time provides valuable insights for forecasting. trend lines or moving averages help to smooth out short-term fluctuations and highlight long-term changes.
+- **Trend analysis**: identifying whether the series exhibits an increasing or decreasing trend over time provides valuable insights for forecasting. trend lines or moving averages help to smooth out short-term fluctuations and highlight long-term changes.
 
-- Seasonality detection: many time series contain recurring patterns at fixed intervals. examining seasonal components using periodograms, decomposition techniques, or visual inspections can help confirm the presence of seasonality.
+- **Seasonality detection**: many time series contain recurring patterns at fixed intervals. examining seasonal components using periodograms, decomposition techniques, or visual inspections can help confirm the presence of seasonality.
 
-- Stationarity check: assessing whether the statistical properties of the series remain constant over time is essential for modeling. tests like the augmented dickey-fuller (ADF) or kpss tests help determine if the series is stationary or requires transformations.
+- **Stationarity check**: assessing whether the statistical properties of the series remain constant over time is essential for modeling. tests like the augmented dickey-fuller (ADF) or kpss tests help determine if the series is stationary or requires transformations.
 
-- Autocorrelation analysis: understanding how past values influence future values is important for forecasting. autocorrelation function (ACF) and partial autocorrelation function (PACF) plots help identify lags with significant correlations.
+- **Autocorrelation analysis**: understanding how past values influence future values is important for forecasting. autocorrelation function (ACF) and partial autocorrelation function (PACF) plots help identify lags with significant correlations.
 
-- Summary statistics: computing basic descriptive statistics such as mean, median, variance, skewness, and kurtosis provides a better understanding of the data's distribution and variability.
+- **Summary statistics**: computing basic descriptive statistics such as mean, median, variance, skewness, and kurtosis provides a better understanding of the data's distribution and variability.
 
-- Lag analysis: exploring the relationships between observations at different time steps can reveal dependencies and help in feature engineering for modeling.
+- **Lag analysis**: exploring the relationships between observations at different time steps can reveal dependencies and help in feature engineering for modeling.
 
-- Anomaly detection: detecting sudden spikes, drops, or irregular patterns is crucial to identifying potential data issues or real-world events that may need further investigation.
+- **Anomaly detection**: detecting sudden spikes, drops, or irregular patterns is crucial to identifying potential data issues or real-world events that may need further investigation.
 
-- Distribution analysis: examining the distribution of values over time helps determine if transformations are needed to stabilize variance and meet modeling assumptions.
+- **Distribution analysis**: examining the distribution of values over time helps determine if transformations are needed to stabilize variance and meet modeling assumptions.
 
-- Decomposition analysis: breaking down the series into trend, seasonality, and residual components allows a deeper understanding of the underlying structure and facilitates better model selection.
+- **Decomposition analysis**: breaking down the series into trend, seasonality, and residual components allows a deeper understanding of the underlying structure and facilitates better model selection.
 
 Performing a thorough exploratory data analysis ensures that the data is well understood and prepared for subsequent steps such as feature engineering and model development. It helps to make informed decisions, avoid potential biases, and optimize the performance of forecasting models.
 
