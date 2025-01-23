@@ -730,34 +730,42 @@ These models assume that time series data follow specific mathematical relations
 - Exponential Smoothing (Holt-Winters): ideal for capturing short-term trends and seasonality, commonly used for sales and inventory forecasting.
 - VAR (Vector AutoRegression): useful when multiple time series variables influence each other, often applied in economic and financial contexts.
 
-Machine learning models: these models are data-driven and can capture complex patterns without assuming underlying relationships. they are particularly useful when dealing with high-dimensional data or non-linear patterns. commonly used models include:
+###  Machine learning models
 
-Random Forest and Gradient Boosting (XGBoost, LightGBM): effective for time series with many explanatory variables, commonly used in financial and marketing analytics.
-Support Vector Regression (SVR): useful for capturing complex relationships in high-frequency data, often applied in climate and energy forecasting.
-K-Nearest Neighbors (KNN): applicable when historical patterns repeat over time, useful in sensor data and demand forecasting.
-Deep learning models: these models are powerful when dealing with large amounts of data, capturing long-term dependencies and complex relationships. deep learning models are suitable for high-frequency, multi-dimensional time series data. popular models include:
+These models are data-driven and can capture complex patterns without assuming underlying relationships. they are particularly useful when dealing with high-dimensional data or non-linear patterns. commonly used models include:
 
-Recurrent Neural Networks (RNN): capable of capturing sequential dependencies, often used in text, speech, and financial data forecasting.
-Long Short-Term Memory (LSTM): an advanced form of RNN that handles long-term dependencies and is widely applied in healthcare, financial forecasting, and anomaly detection.
-Convolutional Neural Networks (CNN): although traditionally used for image processing, they are effective in extracting meaningful features from time series data.
-Transformers: capable of handling long-range dependencies and parallel processing, useful in large-scale financial and climate models.
-Choosing the Right Model for Different Contexts
+- Random Forest and Gradient Boosting (XGBoost, LightGBM): effective for time series with many explanatory variables, commonly used in financial and marketing analytics.
+- Support Vector Regression (SVR): useful for capturing complex relationships in high-frequency data, often applied in climate and energy forecasting.
+- K-Nearest Neighbors (KNN): applicable when historical patterns repeat over time, useful in sensor data and demand forecasting.
+
+### Deep learning models: 
+
+These models are powerful when dealing with large amounts of data, capturing long-term dependencies and complex relationships. deep learning models are suitable for high-frequency, multi-dimensional time series data. popular models include:
+
+- Recurrent Neural Networks (RNN): capable of capturing sequential dependencies, often used in text, speech, and financial data forecasting.
+- Long Short-Term Memory (LSTM): an advanced form of RNN that handles long-term dependencies and is widely applied in healthcare, financial forecasting, and anomaly detection.
+- Convolutional Neural Networks (CNN): although traditionally used for image processing, they are effective in extracting meaningful features from time series data.
+- Transformers: capable of handling long-range dependencies and parallel processing, useful in large-scale financial and climate models.
+
+**Choosing the Right Model for Different Contexts** 
+
 The appropriate model depends on the specific use case and time granularity:
 
-Long-term forecasting (years or decades): models such as ARIMA, SARIMA, and LSTM are well suited for long-term trend forecasting, commonly applied in economic planning, energy consumption analysis, and infrastructure development.
+- Long-term forecasting (years or decades): models such as ARIMA, SARIMA, and LSTM are well suited for long-term trend forecasting, commonly applied in economic planning, energy consumption analysis, and infrastructure development.
 
-Medium-term forecasting (months to years): exponential smoothing and gradient boosting models work effectively for demand forecasting, sales trends, and resource planning in industries such as retail and manufacturing.
+- Medium-term forecasting (months to years): exponential smoothing and gradient boosting models work effectively for demand forecasting, sales trends, and resource planning in industries such as retail and manufacturing.
 
-Short-term forecasting (days to weeks): machine learning models like random forests and neural networks are effective for short-term demand, traffic, and weather forecasting.
+- Short-term forecasting (days to weeks): machine learning models like random forests and neural networks are effective for short-term demand, traffic, and weather forecasting.
 
-High-frequency data (hours, minutes, seconds): deep learning models such as LSTM and transformers are well suited for stock price predictions, IoT sensor data analysis, and network traffic monitoring.
+- High-frequency data (hours, minutes, seconds): deep learning models such as LSTM and transformers are well suited for stock price predictions, IoT sensor data analysis, and network traffic monitoring.
 
-Domain-specific models:
+- Domain-specific models:
 
-Finance: ARIMA, GARCH, and LSTM models are commonly used to analyze stock prices, risk management, and algorithmic trading.
-Weather forecasting: SARIMA and deep learning models capture seasonal patterns and complex dependencies in meteorological data.
-Healthcare: RNN and anomaly detection models help track patient health metrics and predict disease outbreaks.
-Energy consumption: exponential smoothing and gradient boosting models forecast energy demand and optimize grid operations.
+1. Finance: ARIMA, GARCH, and LSTM models are commonly used to analyze stock prices, risk management, and algorithmic trading.
+2. Weather forecasting: SARIMA and deep learning models capture seasonal patterns and complex dependencies in meteorological data.
+3. Healthcare: RNN and anomaly detection models help track patient health metrics and predict disease outbreaks.
+4. Energy consumption: exponential smoothing and gradient boosting models forecast energy demand and optimize grid operations.
+
 Selecting the right model requires understanding the characteristics of the data and the specific goals of the analysis. It is often beneficial to experiment with multiple models, compare their performance using evaluation metrics such as RMSE or MAE, and select the one that best balances complexity and accuracy.
 
 ## 7. Model Training and evaluation
