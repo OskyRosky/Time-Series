@@ -685,6 +685,38 @@ Ultimately, addressing anomalies is not just about improving model accuracy, but
 
 ## 5. Decomposition of Time Series.
 
+Decomposition of a time series is an essential technique that allows us to break down complex data into simpler components to better understand its underlying structure. The concept of decomposition originates from the idea that most time series data are influenced by multiple factors acting simultaneously, and separating these components helps in identifying trends, seasonality, and random variations more clearly.
+
+Decomposing a time series is useful for several reasons:
+
+- **Improved interpretability**: breaking down the data into distinct components such as trend, seasonality, and residual noise allows for a clearer understanding of the factors influencing the series. this separation helps analysts and decision-makers identify long-term patterns and periodic fluctuations more effectively.
+
+- **Enhanced forecasting accuracy**: when the individual components are isolated, it becomes easier to model each separately, leading to better predictions. for example, understanding seasonal variations separately from long-term trends can improve the selection of forecasting models.
+
+- **Anomaly detection support**: decomposition helps distinguish between expected patterns and true anomalies. by isolating the irregular component, it becomes easier to identify unusual fluctuations that do not align with the expected trend or seasonal behavior.
+
+- **Data smoothing and noise reduction**: decomposing the series helps remove short-term fluctuations and random noise, making it easier to focus on the essential aspects of the data without distractions from transient variations.
+
+However, it is important to recognize that decomposition is **not always appropriate or necessary**, depending on the nature and context of the data:
+
+- **Non-seasonal or irregular data**: some datasets do not exhibit clear seasonal or trend components. applying decomposition in such cases may introduce artificial patterns that do not exist, leading to incorrect interpretations.
+
+- **Short time series**: when data is limited, decomposition methods may fail to identify meaningful components due to insufficient observations to capture seasonality or trend accurately.
+
+- **Context dependency**: in certain industries, external factors such as economic shifts, policy changes, or market disruptions may have a more significant impact than inherent patterns within the data itself, making decomposition less effective.
+
+The primary methods for decomposing a time series include:
+
+- **Additive decomposition**: assumes the time series is composed of additive relationships among trend, seasonality, and residual components. this method works well when variations remain relatively constant over time.
+
+- **Multiplicative decomposition**: assumes that the components interact multiplicatively, meaning seasonal variations increase or decrease proportionally with the trend. this approach is useful when data exhibits exponential growth or varying seasonal effects.
+
+- **STL decomposition (Seasonal-Trend decomposition using Loess)**: a more flexible technique that can handle non-linear trends and varying seasonal effects by applying local smoothing methods.
+
+Understanding when and how to apply decomposition requires a careful assessment of the data's properties, business context, and analytical objectives. While decomposition can provide valuable insights, it is important to avoid over-reliance on it when simpler methods might suffice or when the data does not exhibit the required structure for meaningful decomposition.
+
+
+
 ## 6. Model selection.
 
 ## 7. Model Training and Evaluation
