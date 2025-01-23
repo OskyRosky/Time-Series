@@ -1,6 +1,4 @@
-nh         uy7# Time Series
-
-Everything about time series (TS)
+#Everything about time series (TS) #
 
  ![ut](/ima/ima1.png)
 
