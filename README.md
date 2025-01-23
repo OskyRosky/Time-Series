@@ -769,7 +769,7 @@ Selecting the right model requires understanding the characteristics of the data
 
 ## 7. Model Training and evaluation
 
-## 8. Fine tuning
+## 8. Hyperparameter Tuning
 
 ## 9. Forecasting and interpretation
 
