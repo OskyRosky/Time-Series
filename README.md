@@ -715,11 +715,9 @@ The primary methods for decomposing a time series include:
 
 Understanding when and how to apply decomposition requires a careful assessment of the data's properties, business context, and analytical objectives. While decomposition can provide valuable insights, it is important to avoid over-reliance on it when simpler methods might suffice or when the data does not exhibit the required structure for meaningful decomposition.
 
-
-
 ## 6. Model selection.
 
-## 7. Model Training and Evaluation
+## 7. Model Training and evaluation
 
 ## 8. Fine tuning
 
