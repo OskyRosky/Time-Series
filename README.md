@@ -769,7 +769,41 @@ Selecting the right model requires understanding the characteristics of the data
 
 ## 7. Model Training and evaluation
 
+Training and evaluating a time series model is a crucial step that ensures the model's accuracy and reliability in forecasting. Unlike traditional cross-sectional data, time series data requires careful handling due to its temporal dependencies. This means that splitting the data into training, validation, and test sets must follow a sequential approach to preserve the chronological order and avoid data leakage.
 
+In time series analysis, the standard approach involves:
+
+- Training set: used to fit the model by learning patterns, trends, and seasonality. it should cover the longest period possible to capture all relevant behaviors in the data.
+- Validation set: used to fine-tune the model and evaluate how well it generalizes to unseen periods. the validation set must always follow the training set in chronological order to simulate future forecasting conditions.
+- Test set: serves as the final evaluation step to assess how the model performs on completely unseen data. it provides an unbiased estimate of real-world performance.
+
+Unlike typical data science applications where a 50-50 or 70-30 split may be used, time series models require more historical data for training. A common practice is to allocate approximately **70-80% for training, 10-15% for validation**, and the remaining portion for testing. This approach ensures that the model learns long-term dependencies and seasonality, which are crucial for accurate forecasting.
+
+### Goodness of Fit Metrics for Time Series
+
+Evaluating the performance of a time series model involves using specific metrics that measure how well the predictions match actual observations. The most popular evaluation metrics include:
+
+- Mean Absolute Error (MAE): measures the average magnitude of errors between predicted and actual values. it provides an intuitive sense of prediction accuracy by focusing on absolute differences without considering direction.
+- Root Mean Squared Error (RMSE): calculates the square root of the average squared differences between predicted and actual values. it penalizes larger errors more heavily, making it useful when large deviations need to be minimized.
+- Mean Absolute Percentage Error (MAPE): expresses the prediction error as a percentage of the actual values, making it easier to interpret across different scales. it is commonly used in business and finance applications.
+- Mean Squared Logarithmic Error (MSLE): useful when the model needs to capture growth trends by penalizing underestimation more than overestimation. it is often applied in financial and demographic forecasting.
+- Theil’s U Statistic: compares the forecasting model against a naive benchmark, helping to assess whether the model provides significant improvements over a simple prediction method.
+
+Choosing the right metric depends on the business context and the importance of over- or under-predictions. Some metrics, like MAPE, may not be suitable when dealing with values close to zero, while RMSE is often preferred for penalizing larger deviations.
+
+### Learning Curve in Time Series Analysis
+
+In time series modeling, the learning curve is an essential diagnostic tool to evaluate how well the model improves with increasing training data. Unlike standard learning curves, where random splits are used, time series learning curves must maintain chronological order to reflect real-world scenarios.
+
+A typical learning curve in time series analysis plots the model error (such as RMSE or MAE) against the number of training observations. This helps to understand:
+
+- Underfitting: if both training and validation errors are high, the model lacks complexity and may require more data or additional features.
+- Overfitting: if training error is low but validation error remains high, the model has memorized the historical patterns and fails to generalize.
+- Data sufficiency: analyzing the curve helps determine if adding more historical data leads to meaningful improvements in accuracy.
+
+A well-constructed learning curve allows data scientists to make informed decisions about the training period length and whether additional data points will enhance the model’s predictive power.
+
+In conclusion, raining and evaluating time series models require a disciplined approach to data splitting, proper evaluation using domain-specific metrics, and careful observation of learning curves to optimize performance. Taking these steps ensures the model is robust, reliable, and capable of making accurate future predictions.
 
 ## 8. Hyperparameter Tuning
 
