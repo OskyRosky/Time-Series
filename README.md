@@ -1021,26 +1021,28 @@ Deployment ensures that the model’s outputs are readily available and presente
 
 Deploying a model is not the end of the process. Continuous monitoring is essential to verify that the model performs as expected and remains aligned with the evolving data patterns.
 
-Why monitoring is critical:
+1. Why monitoring is critical:
 
-Time series data is dynamic, and real-world conditions can change over time.
-Models may degrade due to concept drift, where the underlying relationships in the data shift.
-Monitoring ensures that the forecasts remain accurate and relevant, reducing the risk of making decisions based on outdated or incorrect predictions.
-Key aspects of monitoring:
+- Time series data is dynamic, and real-world conditions can change over time.
+- Models may degrade due to concept drift, where the underlying relationships in the data shift.
+- Monitoring ensures that the forecasts remain accurate and relevant, reducing the risk of making decisions based on outdated or incorrect predictions.
 
-Track forecast accuracy: compare predicted values against actual outcomes over time. if significant discrepancies arise, investigate the reasons behind them.
-Evaluate goodness-of-fit metrics: regularly calculate metrics like RMSE or MAE to ensure the model continues to meet performance benchmarks.
-Detect anomalies: monitor for unexpected patterns or errors in the predictions, which could indicate a need for retraining or updating the model.
-Automate alerts: set up automated systems to notify stakeholders if the model’s performance falls below acceptable thresholds.
+2. Key aspects of monitoring:
+
+- Track forecast accuracy: compare predicted values against actual outcomes over time. if significant discrepancies arise, investigate the reasons behind them.
+- Evaluate goodness-of-fit metrics: regularly calculate metrics like RMSE or MAE to ensure the model continues to meet performance benchmarks.
+- Detect anomalies: monitor for unexpected patterns or errors in the predictions, which could indicate a need for retraining or updating the model.
+- Automate alerts: set up automated systems to notify stakeholders if the model’s performance falls below acceptable thresholds.
 
 ### Retraining and Refining the Model
 
 When monitoring reveals that the model is no longer performing as expected, retraining becomes necessary. This involves incorporating new data to improve the model’s understanding of the current trends and patterns.
 
 Steps to refine the model:
-Collect and preprocess the latest data to reflect recent changes.
-Reevaluate the model’s hyperparameters and structure to address any new complexities.
-Validate the updated model on unseen data to confirm that it outperforms the previous version.
+
+- Collect and preprocess the latest data to reflect recent changes.
+- Reevaluate the model’s hyperparameters and structure to address any new complexities.
+* Validate the updated model on unseen data to confirm that it outperforms the previous version.
 
 ### Conclusion
 
