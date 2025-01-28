@@ -920,17 +920,19 @@ Forecasting and interpretation are the culmination of all preceding steps in the
 
 Scenario and sensitivity analysis is a valuable extension of time series forecasting that helps assess how robust a model is under different conditions and how sensitive it is to changes in key variables. These methods add strength to the analysis by testing the model’s performance beyond the baseline forecasts, providing insights into potential risks, uncertainties, and alternative outcomes.
 
-Scenario Analysis
+### Scenario Analysis
+
 Scenario analysis involves designing hypothetical situations or future events to evaluate how the time series model reacts to these conditions. It allows analysts to explore a range of possible outcomes and test the model’s adaptability to different scenarios.
 
-Why scenario analysis is important:
+1. Why scenario analysis is important:
 
 It prepares decision-makers for unexpected events by modeling best-case, worst-case, and most-likely scenarios.
 It highlights how external factors, such as economic shifts, policy changes, or market disruptions, may impact the forecasted values.
 It tests the model’s robustness by simulating situations outside the observed historical data.
-How to conduct scenario analysis in time series:
 
-Define scenarios: create realistic scenarios based on domain expertise or known uncertainties. for example:
+2. How to conduct scenario analysis in time series:
+
+- Define scenarios: create realistic scenarios based on domain expertise or known uncertainties. for example:
 How would a sudden spike in energy prices affect demand forecasts?
 What happens to sales projections if interest rates rise?
 Adjust inputs: modify key variables or external regressors in the forecasting model to reflect the defined scenarios.
@@ -938,7 +940,8 @@ Generate forecasts: run the model for each scenario to observe the projected out
 Compare results: analyze differences between the baseline forecast and the scenario-specific forecasts to understand the model’s response.
 Scenario analysis provides a broader perspective on potential outcomes, enabling proactive planning and risk management.
 
-Sensitivity Analysis
+### Sensitivity Analysis
+
 Sensitivity analysis examines how changes in one or more input variables impact the output of the time series model. It focuses on understanding which variables have the greatest influence on the forecast and how sensitive the model is to small perturbations.
 
 Why sensitivity analysis is useful:
@@ -954,13 +957,16 @@ Measure impact: observe the resulting changes in the model’s forecasts and ana
 Rank sensitivity: rank the variables based on their impact to determine which ones are most significant.
 For example, in sales forecasting, sensitivity analysis could reveal that changes in marketing spend have a higher influence on projections than changes in seasonal factors. This insight allows businesses to focus their resources more effectively.
 
-Integrating Scenario and Sensitivity Analysis
+### Integrating Scenario and Sensitivity Analysis
+
 Combining scenario and sensitivity analysis offers a comprehensive understanding of how the time series model performs under both hypothetical and small-scale changes. Together, they help answer critical questions such as:
 
 Is the model robust to external shocks or deviations?
 Which variables or factors are most important in influencing the forecast?
 How can the results inform strategic planning and decision-making?
-Conclusion
+
+### Conclusion
+
 Scenario and sensitivity analysis provide an additional layer of depth to time series modeling by evaluating the model’s behavior under a variety of conditions. These techniques not only enhance the reliability of the analysis but also empower decision-makers with the insights needed to anticipate risks and make more informed, data-driven decisions. Ultimately, this step transforms static forecasts into dynamic tools for strategic planning.
 
 ## 11. Deployment and monitoring
