@@ -973,6 +973,28 @@ Scenario and sensitivity analysis provide an additional layer of depth to time s
 
 Deployment and monitoring are the final stages of time series analysis, where the results and models are made accessible to stakeholders or end-users. This step is essential to ensure that the insights generated from the model are actionable, practical, and continuously evaluated for performance in real-world scenarios.
 
+### Deployment: Making Results Accessible
+
+Once the time series model has been developed and validated, it must be deployed to enable easy access and usability. Deployment involves exposing the forecasts and insights to the relevant users in a practical and efficient way. The deployment method depends on the context, audience, and technological infrastructure of the organization.
+
+1. Why local deployment is outdated:
+
+Local solutions are limited in scalability, accessibility, and collaboration.
+They are harder to maintain and often lack the flexibility required for modern applications.
+
+2. Preferred deployment methods:
+
+- Cloud-based solutions: Platforms like AWS, GCP, and Azure provide scalable, secure, and accessible environments for deploying time series models.
+AWS: Use services like SageMaker for deploying machine learning models or Lambda for serverless execution.
+GCP: Utilize Vertex AI or BigQuery ML for seamless integration with cloud-based analytics.
+Azure: Leverage Azure Machine Learning or Azure Time Series Insights to deploy and visualize forecasts.
+
+- Dashboards and visualizations: Platforms like Power BI, Tableau, or custom-built dashboards using frameworks like Dash or Streamlit can present forecasts in an interactive and visually appealing format.
+- APIs: Expose the model as a REST API for integration with other systems, enabling dynamic access to forecasts in real-time applications.
+- Embedded systems: In specific use cases, such as IoT devices, models can be deployed at the edge to provide on-device forecasts.
+  
+Deployment ensures that the model’s outputs are readily available and presented in a way that supports decision-making.
+
 ## 12. Reporting and decision-making
 
 # V. Time series applications.
