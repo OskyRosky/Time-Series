@@ -971,6 +971,8 @@ Scenario and sensitivity analysis provide an additional layer of depth to time s
 
 ## 11. Deployment and monitoring
 
+Deployment and monitoring are the final stages of time series analysis, where the results and models are made accessible to stakeholders or end-users. This step is essential to ensure that the insights generated from the model are actionable, practical, and continuously evaluated for performance in real-world scenarios.
+
 ## 12. Reporting and decision-making
 
 # V. Time series applications.
