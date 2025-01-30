@@ -100,6 +100,8 @@ For further discussions, contributions, or improvements, feel free to:
 
 ---------------------------------------------
 
+ ![ut](/ima/ima2.png)
+
 # I. Time series
 
 ## 1. What's Time Series
@@ -140,6 +142,9 @@ The popularity of time series analysis stems from its ability to provide valuabl
 
 The impact of time series analysis on society is significant: it helps businesses stay competitive, enables policymakers to plan effectively, and assists individuals in making data-driven decisions. From improving financial investment strategies to predicting climate changes, time series analysis plays a pivotal role in shaping our world.
 
+ ![ut](/ima/ima3.jpg)
+
+
 ## 2. Why is Time Series analysis important?
 
 ### Identifying Trends and Patterns
@@ -161,6 +166,8 @@ Time series analysis is instrumental in identifying outliers and irregular patte
 ### Resource Optimization
 
 Understanding demand patterns and trends through time series analysis allows organizations to allocate resources more efficiently. This can lead to cost savings, improved service delivery, and better management of supply chains and inventories.
+
+ ![ut](/ima/ima4.jpeg)
 
 ## 3. Categories of Time Series Analysis
 
@@ -199,6 +206,8 @@ Financial Time Series: Methods tailored for market trend analysis, volatility mo
 Environmental Time Series: Techniques focused on analyzing climate data, air pollution trends, and ecological patterns to inform sustainability efforts.
 
 Healthcare Time Series: Specialized approaches for monitoring patient health metrics and predicting disease progression to improve medical interventions.
+
+ ![ut](/ima/ima5.jpg)
 
 # II. Time series tools
 
@@ -334,6 +343,8 @@ A predictive analytics platform that includes time series forecasting as part of
 
 These solutions offer a wide range of functionalities from data ingestion to visualization and forecasting, making them suitable for businesses and researchers looking to leverage time series analysis without extensive programming knowledge.
 
+ ![ut](/ima/ima6.jpeg)
+
 # III. Uses of Time Series analysis.
 
 ## 1. Descriptive Analysis
@@ -397,6 +408,8 @@ Detecting structural changes in the data to identify moments when the system’s
 ##  10. Temporal Correlation Analysis Between Variables
 
 Determining how one time series influences another over time through cross-correlation techniques.
+
+ ![ut](/ima/ima7.jpg)
 
 # IV. Top Time Series applicatioms by fiel.
 
@@ -591,6 +604,8 @@ Workforce demand planning
 Productivity trend analysis
 Training effectiveness measurement over time
 Compensation and benefits trend forecasting
+
+ ![ut](/ima/ima11.jpg)
 
 # V. Time series methodology.
 
@@ -936,6 +951,8 @@ Once hyperparameter tuning is complete, the "winning model" is selected based on
 
 Hyperparameter tuning is an iterative process that balances computational efficiency with model accuracy. By carefully tuning hyperparameters and using tools like validation curves, time series models can be optimized to deliver reliable and actionable forecasts.
 
+ ![ut](/ima/ima8.png)
+
 ## 9. Forecasting and interpretation
 
 Forecasting is the final step in the time series analysis pipeline, where the selected model is used to estimate future values over a defined time horizon, denoted as H. This stage aims to provide actionable insights by predicting trends, seasonal patterns, or anomalies that can inform decision-making. However, producing point forecasts alone is not sufficient; generating confidence intervals and interpreting the results in the context of the problem are equally important to ensure meaningful and reliable outcomes.
@@ -985,6 +1002,8 @@ Scenario analysis: forecasts can be combined with scenario analysis to assess ho
 ### Conclusion
 
 Forecasting and interpretation are the culmination of all preceding steps in the time series analysis process. Beyond producing accurate predictions, the true value lies in presenting these forecasts in a way that incorporates uncertainty and provides actionable insights. Confidence intervals, logical validation, and domain expertise play a central role in ensuring that forecasts are both reliable and practical. Ultimately, this stage transforms data-driven predictions into meaningful decisions and strategies.
+
+ ![ut](/ima/ima9.png)
 
 ## 10. Scenario and sensitivity analysis
 
@@ -1164,7 +1183,7 @@ Refine strategies: adjust business decisions based on updated forecasts and insi
 
 Reporting and decision-making are the bridge between data analysis and real-world impact. By presenting forecasts in a clear, actionable format and linking them to business strategies, time series analysis becomes a powerful tool for driving organizational success. These final steps ensure that the effort invested in the analysis translates into meaningful, data-driven decisions.
 
-
+ ![ut](/ima/ima10.webp)
 
 # V. Time series applications.
 
