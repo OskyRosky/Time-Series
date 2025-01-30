@@ -409,6 +409,8 @@ Detecting structural changes in the data to identify moments when the system’s
 
 Determining how one time series influences another over time through cross-correlation techniques.
 
+ ![ut](/ima/ima7.jpg)
+
 # IV. Top Time Series applicatioms by fiel.
 
 ## 1. Finance
@@ -602,6 +604,8 @@ Workforce demand planning
 Productivity trend analysis
 Training effectiveness measurement over time
 Compensation and benefits trend forecasting
+
+ ![ut](/ima/ima11.jpg)
 
 # V. Time series methodology.
 
