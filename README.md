@@ -951,6 +951,8 @@ Once hyperparameter tuning is complete, the "winning model" is selected based on
 
 Hyperparameter tuning is an iterative process that balances computational efficiency with model accuracy. By carefully tuning hyperparameters and using tools like validation curves, time series models can be optimized to deliver reliable and actionable forecasts.
 
+ ![ut](/ima/ima8.png)
+
 ## 9. Forecasting and interpretation
 
 Forecasting is the final step in the time series analysis pipeline, where the selected model is used to estimate future values over a defined time horizon, denoted as H. This stage aims to provide actionable insights by predicting trends, seasonal patterns, or anomalies that can inform decision-making. However, producing point forecasts alone is not sufficient; generating confidence intervals and interpreting the results in the context of the problem are equally important to ensure meaningful and reliable outcomes.
