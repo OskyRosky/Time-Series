@@ -1,0 +1,1174 @@
+---
+title: "Universidad de Costa Rica"
+subtitle: "Pronóstico Transferencias Corrientes"
+output: 
+    html_document:
+      css: custom.css
+      code_folding: hide
+      toc: no
+      theme: flatly
+      highlight: tango
+---
+
+<style>
+table {
+background-color:#FFFFFF;
+}
+</style>
+
+<style>
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: darkblue;
+}
+</style>
+
+<button onclick="document.body.scrollTop = document.documentElement.scrollTop = 0;" style="
+    position: fixed;
+    bottom: 5px;
+    right: 40px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    color: #fff;
+    background-color: #0A71A0;
+    border: none;
+    border-radius: 15px;
+    
+">Ir arriba</button>
+
+# Proyecto Final {.tabset .tabset-fade .tabset-pills}
+
+Andrés Anguedas
+Patricia Delvó
+Fiorella Laurito
+
+## Introducción
+
+![](intro.jpg)
+
+## Objetivo de Investigación
+
+> Pronosticar las transferencias corrientes de Costa Rica en el período julio 2018 a junio 2020 con base en datos del Sistema Integrado de Gestión de Administración Financiera (SIGAF) y liquidaciones mensuales del Gobierno con una periodicidad mensual para el periodo comprendido de enero 2007 a junio 2018.
+
+
+## Metodología
+
+![](meto.jpg)
+
+
+## Resultados
+
+
+```{r,message=FALSE,warning=FALSE,include=FALSE}
+setwd("~/Red")
+# Cargamos los paquetes necesarios
+
+library(forecast)
+library(ggplot2)
+library(astsa)
+library(nnet)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(highcharter)
+library(broom)
+
+# Cargamos el archivo con los datos de las transferencias del gobierno:
+
+transferencias <- read.csv("transferencias.csv", sep = ";",dec = ",")
+
+# Ya que el monto de las transferencias está en colones nominales, necesitamos
+# deflatarlos para poder realizar el análisis
+
+transferencias$monto_real <- transferencias$transferencias * 100 / transferencias$ipc
+
+transferencias$Mes<-as.Date(as.character(transferencias$fecha), format = "%d/%m/%Y")
+
+
+```
+
+### Serie de la cartera crediticia{.tabset .tabset-fade .tabset-pills}
+
+#### Análisis Descriptivo
+
+```{r Datos2, echo=TRUE,fig.align='center'}
+
+serie2 <- ts(transferencias$monto_real, start = c(2007, 1), end = c(2018, 6), frequency = 12)
+
+
+#highchart() %>%
+ # hc_xAxis(title= list(text = "Mes"),categories = format(datos$Mes,format="%b %Y"),
+#           type="datetime",tickInterval = 8) %>%
+ # hc_add_series(name = "Cartera", data = datos$Cartera_credito, color="darkturquoise") %>% 
+  #hc_yAxis(title = list(text = "Colones"),min=125000, max=325000,
+   #        labels = list(format = "{value}")) %>% 
+  #hc_tooltip(crosshairs = T,valueDecimals = 1)%>% 
+  #hc_title(text = "Gráfico 1 <br> Cartera Crediticia de Enero 2010 a Setiembre 2018 ",
+   #        margin = 20, align = "center",
+    #       style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  #hc_subtitle(text = "Millones de colones",
+   #           align = "center")  %>%
+    #  hc_chart(
+     #   zoomType = "xy"
+    #  )%>% 
+  #hc_size(width = 800,height=600)
+
+
+highchart(type="stock") %>%
+  hc_add_series(name = "Tranferencias", data = serie2, color="darkturquoise") %>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>% 
+  hc_title(text = "Gráfico 1 <br> Tranferencias corrientes de Enero 2007 a Junio 2018 ",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")  %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 800,height=600)
+
+
+```
+Elaboración con datos de Sistema Integrado para la Gestión de la Administración Financiera 
+y liquidaciones mensuales del Gobierno 2007 a 2018
+
+#### Descomposición de la serie
+
+```{r,message=FALSE,warning=FALSE,fig.align='center'}
+
+x <- stl(serie2, s.window = "periodic", robust = TRUE)
+
+sea<-x$time.series[,1]
+tre<-x$time.series[,2]
+irreg<-x$time.series[,3]
+
+titulo<-hchart(serie2,color="white",showInLegend = FALSE)%>% 
+  hc_title(text = "Gráfico 2 <br> Descomposición de  tranferencias corrientes de Enero 2007 a Junio 2018 ",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center") %>% hc_add_theme(hc_theme_null()) %>% 
+  hc_size(width = 500, height = 50)
+
+serie<-hchart(serie2,color="orange") %>% hc_yAxis(title= list(text = "Cartera"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 500, height = 175)
+estac<-hchart(sea,color="deeppink") %>% hc_yAxis(title= list(text = "Estacionalidad"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 500, height = 175)
+tend<-hchart(tre,color="darkturquoise") %>% hc_yAxis(title= list(text = "Tendencia"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 500, height = 175)
+irregu<-hchart(irreg,color="greenyellow",type="column") %>% hc_yAxis(title= list(text = "Irregularidad"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 500, height = 175)
+
+hw_grid(titulo,
+        serie,
+          estac,
+          tend,
+          irregu, ncol = 1)
+```
+Elaboración con datos de Sistema Integrado para la Gestión de la Administración Financiera 
+y liquidaciones mensuales del Gobierno 2007 a 2018
+
+```{r,message=FALSE,warning=FALSE,fig.align='center',include=FALSE}
+
+col1 <- colorRampPalette(c("coral","yellowgreen","cadetblue" ))
+
+colores <- col1(12)
+
+p1<-ggseasonplot(serie2) + labs(title = " ")+ scale_colour_manual(values = colores)+theme_light()+xlab("Mes")+theme(axis.text.x =element_text(size = 7) ,legend.text = element_text(size = 8))
+
+p2<-ggmonthplot(serie2)+ labs(title = " ")+geom_line(color = "yellowgreen")+theme_light()+ylab("Colones")+xlab("Mes")+theme(axis.text.x =element_text(size = 7))
+
+library(ggpubr)
+fuente<-"Elaboración con datos de SIGAF y liquidaciones mensuales del Gobierno 2007 a 2018"
+
+p<-ggarrange(p2,p1)
+annotate_figure(p,
+               top = text_grob("Gráfico 3 \n Comportamiento mensual en las transacciones corrientes \n de Enero 2007 a Junio 2018  \n (millones)", color = "black", face = "bold", size = 12),
+               bottom = text_grob(fuente, color = "black",
+                                  hjust = 1, x = 1, size = 9)
+            )
+```
+
+#### Regresión Longitudinal
+
+```{r,fig.align='center',comment="", warning=FALSE, message=FALSE,echo=FALSE}
+
+ts.train.serie2 <- ts(data = transferencias$monto_real[1:114], start = c(2007, 1), end =c(2016, 6), frequency = 12)
+ts.test.serie2 <- ts(data = transferencias$monto_real[115:138],start=c(2016, 7), end = c(2018, 6), frequency = 12)
+
+regr <- tslm(ts.train.serie2 ~ trend + season)
+
+modelo<-data.frame(summary(regr)$coefficients)
+names(modelo)<-c("Estimado","Error Estándar","Valor T","Pr(>|t|)")
+
+modelo$Estimado<-round(modelo$Estimado,3)
+modelo$`Error Estándar`<-round(modelo$`Error Estándar`,3)
+modelo$`Valor T`<-round(modelo$`Valor T`,3)
+modelo$`Pr(>|t|)`<-round(modelo$`Pr(>|t|)`,3)
+
+makeTransparent<-function(someColor, alpha=100)
+{
+  newColor<-someColor + alpha #I wish
+  return(newColor)
+}
+
+transparente<-makeTransparent(2)
+
+modelo$`Pr(>|t|)`<-format(modelo$`Pr(>|t|)`, digits = 3)
+
+modelo %>%
+kable(escape = F,"html", align = c('r','r'), background = "white")%>%
+  kable_styling(bootstrap_options = "striped", full_width = F, font_size = 15)%>%
+  add_header_above(c("Resultados del modelo "= 5)) %>%
+  footnote(general = fuente,
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+
+
+
+hchart(ts.train.serie2,name="Transferencias",color="darkturquoise") %>% 
+  hc_add_series(name = "Estimación",fitted(regr), color="greenyellow")%>% 
+  hc_title(text = "Gráfico 3 <br> Transferencias corrientes y estimación por modelo de regresión longitudinal de Enero 2007 a Junio 2016",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 800,height=600)
+
+
+
+
+```
+Elaboración con datos de Sistema Integrado para la Gestión de la Administración Financiera 
+y liquidaciones mensuales del Gobierno 2007 a 2018
+
+#### Suavizamiento Exponencial ETS(MAdM)
+
+
+```{r,comment="",fig.align='center'}
+
+# Definimos todos los posibles modelos de ETS
+
+pos.mod <- c("ANN", "ANA", "AAN", "AAA", "AAN", "AAA", "MNN", "MNA", "MNM", "MAN",
+             "MAA", "MAM", "MAN", "MAA", "MAM")
+
+# Hacemos todos los modelos ets
+
+m <- data.frame(matrix(0, ncol = 3, nrow = length(pos.mod)))
+colnames(m) <- c("AIC", "AICc", "BIC")
+
+for(i in 1:length(pos.mod)) {
+  d <- F
+  if(match(pos.mod[i], pos.mod) != i) {
+    d <- T
+  }
+  mod <- ets(ts.train.serie2, model = pos.mod[i], damped = d)
+  m[i, 1] <- mod$aic
+  m[i, 2] <- mod$aicc
+  m[i, 3] <- mod$bic
+  assign(paste("mod", i, sep = ""), mod)
+  rm(mod)
+}
+m <- cbind(pos.mod,m)
+# Comparamos las medidas de rendimiento
+
+#m
+
+# Los mejores son 11, 4 y 12 para las tres medidas, vamos a comparar sus
+# medidas de rendimiento
+
+#rbind(accuracy(forecast(mod11, h = 36), ts.test.serie2), 
+ #     accuracy(forecast(mod4, h = 36), ts.test.serie2), 
+  #    accuracy(forecast(mod12, h = 36), ts.test.serie2))
+
+# El mejor ETS es el 4 (AAA o Holt-Winters aditivo). Graficamos los ajustados y
+# los estimados 
+#MNM MAA MAM MAN
+
+MAM <- ets(ts.train.serie2,  model ="MAM",damped = TRUE)
+summary(MAM)
+
+hchart(ts.train.serie2,name="Transferencias",color="darkturquoise") %>% 
+  hc_add_series(name = "Estimación",fitted(MAM), color="greenyellow")%>% 
+  hc_title(text = "Gráfico 4 <br> Transferencias corrientes y estimación por modelo Suavizamiento \n Exponencial (M,Ad,M) de  Enero 2007 a Junio 2016 ",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 800,height=600)
+
+```
+Elaboración con datos de Sistema Integrado para la Gestión de la Administración Financiera 
+y liquidaciones mensuales del Gobierno 2007 a 2018
+
+
+#### ARIMA
+
+```{r,include=FALSE}
+
+
+serie.diff<-diff( diff(ts.train.serie2),lag=12 )
+
+a<-acf(serie.diff)
+
+b<-pacf(serie.diff)
+
+# En este caso, parece que el mejor es ARIMA(5, 1, 0)(2, 1, 0)12. Veamos los
+# supuestos ANDRES
+
+#mod.arima <- Arima(ts.train.serie2, order=c(2,1,1), seasonal=c(1,1,0))
+#mod.arima <- Arima(ts.train.serie2, order=c(1,1,0), seasonal=c(1,1,0))
+mod.arima <- Arima(ts.train.serie2, order=c(1,1,1), seasonal=c(0,1,1))
+#mod.arima <- Arima(ts.train.serie2, order=c(0,1,1), seasonal=c(0,1,1))
+#mod.arima <- Arima(ts.train.serie2, order=c(2,1,1), seasonal=c(1,1,2))
+#mod.arima <- Arima(ts.train.serie2, order=c(1,1,0), seasonal=c(1,1,2))
+#mod.arima <- Arima(ts.train.serie2, order=c(0,1,1), seasonal=c(1,1,0))
+
+cuadro<- sarima(ts.train.serie2,p=1,d=1,q=1,S=12,D=1,P=0,Q=1)$ttable
+
+res<-resid(mod.arima)
+
+c<-acf(res)
+
+#sarima(ts.train.serie2,p=1,d=1,q=1,S=12,D=1,P=0,Q=1)$ttable
+```
+
+
+```{r,comment="",fig.align='center'}
+
+diferencia<-hchart(serie.diff,name="Tranferencias",color="darkturquoise")  %>% 
+  hc_title(text = "Gráfico 5 <br> Serie de transacciones corrientes estacionaria según función de correlación \n de Enero 2007 a Junio 2016 \n (millones)",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(height=400)
+
+cat<-factor(0:19)
+
+ACF<-hchart(a)%>% 
+  hc_yAxis(labels = list(format = "{value:.2f}"),min=-0.6, max=0.4)%>% 
+  hc_size(height = 250,width = 300) %>% 
+  hc_xAxis(min=2)
+
+PACF<-hchart(b)%>% 
+  hc_yAxis(labels = list(format = "{value:.2f}"),min=-0.6, max=0.4)%>% 
+  hc_size(height = 250,width = 300)
+
+CF<-hw_grid(ACF,
+        PACF, ncol = 2,rowheight = 250)
+
+diferencia
+CF
+
+
+```
+
+_____________________________________________________________________________________________________
+
+```{r,comment="", warning=FALSE, message=FALSE,echo=FALSE}
+
+modelo<-data.frame(cuadro)
+names(modelo)<-c("Estimado","Error Estándar","Valor T","Pr(>|t|)")
+
+modelo$Estimado<-round(modelo$Estimado,3)
+modelo$`Error Estándar`<-round(modelo$`Error Estándar`,3)
+modelo$`Valor T`<-round(modelo$`Valor T`,3)
+modelo$`Pr(>|t|)`<-round(modelo$`Pr(>|t|)`,3)
+
+modelo$`Pr(>|t|)`<-format(modelo$`Pr(>|t|)`, digits = 3)
+
+modelo %>%
+ kable( escape = F,"html", align = c('r','r'), background = "white") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, font_size = 15) %>%
+  column_spec(1, width = "3em", bold = T, color = "gray34") %>%
+  add_header_above(c("Resultados del modelo"=5)) %>% 
+  footnote(general = fuente,
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+
+```
+
+
+_____________________________________________________________________________________________________
+
+
+```{r,comment="",fig.align='center',warning=FALSE}
+
+res.esta<-hchart(res,name="Colones",color="darkturquoise")  %>% 
+  hc_title(text = "Gráfico 6 <br> Diagnósticos de residuos del modelo ARIMA(5,1,0)(2,1,0)12 ",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Rediduos Estandarizados",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(height=300)%>% 
+  hc_legend(enabled = FALSE)
+
+acf.res<-hchart(c)%>% 
+  hc_yAxis(labels = list(format = "{value:.2f}"),min=-0.5, max=0.5)%>% 
+  hc_size(height = 250,width = 300) %>% 
+  hc_xAxis(min=2) %>% 
+  hc_title(text = "ACF Residuos",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold"))%>% 
+  hc_legend(enabled = FALSE)
+
+##QQPLOT
+
+probs <- c(0.25, 0.75)
+x1 <- qnorm(probs[1])
+x2 <- qnorm(probs[2])
+y1 <- quantile(res, probs[1])
+y2 <- quantile(res, probs[2])
+
+slope <- (y2-y1)/(x2-x1)  ## observed slope between quantiles
+int <- y1-slope*x1  ## intercept
+
+
+Y<-as.numeric(qqnorm(res,plot.it = F)$y)
+X<-as.numeric(qqnorm(res,plot.it = F)$x)
+valores.line<-int+slope*X
+ 
+#plot(X,Y);lines(X,valores.line,type="l")
+
+puntos<-data.frame(X,Y,valores.line)
+
+
+QQPLOT<-highchart() %>%
+     hc_add_series_scatter(x = puntos$X, y = puntos$Y)%>%
+     hc_add_series_scatter(x = puntos$X, y = puntos$valores.line)%>% 
+  hc_title(text = "QQ Plot de normalidad de residuos estandarizados",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>% 
+  hc_yAxis(title = list(text = "Cuantiles")) %>% 
+  hc_xAxis(title = list(text = "Cuantiles Teóricos"))  %>% 
+  hc_legend(enabled = FALSE) %>% 
+  hc_size(height = 250,width = 300)
+
+
+
+
+
+acf.qq<-hw_grid(acf.res,
+        QQPLOT, ncol = 2,rowheight = 250)
+
+
+#Ljung Box
+
+pvalues<-rep(0,36)
+for (i in 1:36){
+  pvalues[i]<-Box.test(res,type="Ljung",lag=i)$ p.value
+}
+
+pvalues<-pvalues[-1]
+
+pv.gf<-data.frame(pvalues,lags=c(2:36))
+
+LJUNG.BOX<-highchart() %>%
+  hc_add_series_scatter(x = pv.gf$lags, y = pv.gf$pvalues)%>%
+  hc_title(text = "P values estadístico Ljung Box",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>% 
+  hc_yAxis(title = list(text = "p value"),min=0,max=1,
+          plotBands  = list(
+             list(from = 0.048, to = 0.052, color = "darkblue"))) %>% 
+  hc_xAxis(title = list(text = "Rezago"))  %>% 
+  hc_legend(enabled = FALSE)%>% 
+  hc_size(height=210)
+
+
+
+
+res.esta
+acf.qq
+LJUNG.BOX
+
+
+```
+
+
+```{r,comment="",fig.align='center'}
+
+hchart(ts.train.serie2,name="Tranferencias",color="darkturquoise") %>% 
+  hc_add_series(name = "Estimación",fitted(mod.arima), color="greenyellow")%>% 
+  hc_title(text = "Gráfico 7 <br> Transferencias corrientes y estimación por modelo ARIMA(1,1,1)(0,1,1)12 \n  Enero 2007 a Junio 2016",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 800,height=600)
+
+
+```
+Elaboración con datos de Sistema Integrado para la Gestión de la Administración Financiera 
+y liquidaciones mensuales del Gobierno 2007 a 2018
+
+
+#### ARIMA intervención 
+
+Agregaron las variables:
+
+* Impulso Febrero 2008
+
+
+##### Análisis de intervenciones 
+
+```{r,include=FALSE}
+
+(break_point <- strucchange:::breakpoints(serie2 ~ 1)) 
+#plot(break_point)
+
+RSS<-as.numeric(plot(break_point)$RSS[1,])
+BIC<-as.numeric(plot(break_point)$RSS[2,])
+N<-0:5
+
+```
+
+
+
+```{r,comment="",fig.align='center',warning=FALSE}
+
+BP<-data.frame(N,RSS,BIC)
+
+highchart() %>% 
+  hc_add_series(data = BP$BIC)%>%
+  hc_title(text = "Número de quiebres contra BIC",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>% 
+  hc_yAxis(title = list(text = "BIC")) %>% 
+  hc_xAxis(title = list(text = "Número de puntos de quiebre"))  %>% 
+  hc_legend(enabled = FALSE) %>% 
+  hc_size(width = 700,height=400)
+
+
+hchart(serie2,name= "Transferencias",  color="darkturquoise") %>%
+  hc_add_series(name = "Cambios",fitted(break_point, breaks = 3), color="greenyellow")%>% 
+  hc_title(text = "Dos puntos de quiebre",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 600,height=400)%>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>%
+  hc_chart(
+        zoomType = "xy"
+      )
+
+```
+
+
+
+![](modelos.intervencion.jpg)
+
+```{r,include=FALSE}
+
+
+m3.x1<-c(rep(0, break_point$breakpoints[1]), 
+      rep(1,  break_point$breakpoints[2]-break_point$breakpoints[1] ), 
+      rep(0,  length(serie2)-break_point$breakpoints[2] ) )
+
+m3.x2<-c(rep(0, break_point$breakpoints[2]), 
+      rep(1,  break_point$breakpoints[3]-break_point$breakpoints[2] ), 
+      rep(0,  length(serie2)-break_point$breakpoints[3] ) )
+
+m3.x3<-c(rep(0, break_point$breakpoints[3]), 
+      rep(1,  length(serie2)-break_point$breakpoints[3] ) )
+
+
+impulso<-c(rep(0,47),1, 
+      rep(0,  length(serie2)-48 ) )
+
+###############################################################
+
+
+x<-data.frame(m3.x1,m3.x2,m3.x3,impulso)    
+
+mod.arima.int2<-sarima(ts.train.serie2,p=1,d=1,q=1,S=12,D=1,P=0,Q=1,xreg = x[1:114,])
+
+mod.arima.int2<-Arima(ts.train.serie2, order=c(1,1,1), seasonal=c(0,1,1),xreg = x[1:114,])
+cuadro2 <- sarima(ts.train.serie2,p=1,d=1,q=1,S=12,D=1,P=0,Q=1,xreg = x[1:114,])$ttable
+
+x<-data.frame(impulso)   
+
+mod.arima.int3 <- sarima(ts.train.serie2,p=1,d=1,q=1,S=12,D=1,P=0,Q=1,xreg = x[1:114,])
+
+mod.arima.int3<-Arima(ts.train.serie2, order=c(1,1,1), seasonal=c(0,1,1),xreg = x[1:114,])
+
+
+MODELO1<-round(c(accuracy(mod.arima.int2)[c(2,3,5)],mod.arima.int2$aic,mod.arima.int2$bic),1)
+
+MODELO2<-round(c(accuracy(mod.arima.int3)[c(2,3,5)],mod.arima.int3$aic,mod.arima.int3$bic),3)
+
+
+cuadro<-rbind(Medida = c("RSME","MAE","MAPE",
+                                        "AIC","BIC"),
+           MODELO1,MODELO2)
+
+colnames(cuadro)<-cuadro[1,]
+cuadro<- cuadro[-1,]
+
+res<-resid(mod.arima.int2)
+
+c<-acf(res)
+
+```
+
+
+```{r,comment="", warning=FALSE, message=FALSE,echo=FALSE}
+data.frame(cuadro)%>% 
+kable( escape = F,"html", align = c('r','r','r','r','r','r'), background = "white") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, font_size = 15) %>%
+  column_spec(1, width = "3em", bold = T, color = "gray34") %>%
+  add_header_above(c("Comparación de modelos ARIMA intervención"=6)) %>% 
+  footnote(general = fuente,
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+
+```
+
+
+
+```{r,comment="", warning=FALSE, message=FALSE,echo=FALSE}
+
+modelo<-data.frame(cuadro2)
+names(modelo)<-c("Estimado","Error Estándar","Valor T","Pr(>|t|)")
+
+modelo$Estimado<-(modelo$Estimado)
+modelo$`Error Estándar`<-(modelo$`Error Estándar`)
+modelo$`Valor T`<-(modelo$`Valor T`)
+modelo$`Pr(>|t|)`<-(modelo$`Pr(>|t|)`)
+
+modelo$`Pr(>|t|)`<-format(modelo$`Pr(>|t|)`, digits = 3)
+
+modelo %>%
+  kable( escape = F,"html", align = c('r','r'), background = "white") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, font_size = 15) %>%
+  column_spec(1, width = "3em", bold = T, color = "gray34") %>%
+  add_header_above(c("Resultados del modelo"=5)) %>% 
+  footnote(general = fuente,
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+
+```
+
+
+Diagnósticos de los residuos
+
+```{r,comment="",fig.align='center',warning=FALSE}
+
+res.esta<-hchart(res,name="Transferencias",color="darkturquoise")  %>% 
+  hc_title(text = "Gráfico 8 <br> Diagnósticos de residuos del modelo ARIMA(1,1,1)(0,1,1)12 con variables de intervención",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Rediduos Estandarizados",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(height=300)%>% 
+  hc_legend(enabled = FALSE)
+
+acf.res<-hchart(c)%>% 
+  hc_yAxis(labels = list(format = "{value:.2f}"),min=-1, max=1)%>% 
+  hc_size(height = 250,width = 300) %>% 
+  hc_xAxis(min=2) %>% 
+  hc_title(text = "ACF Residuos",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold"))%>% 
+  hc_legend(enabled = FALSE)
+
+##QQPLOT
+
+probs <- c(0.25, 0.75)
+x1 <- qnorm(probs[1])
+x2 <- qnorm(probs[2])
+y1 <- quantile(res, probs[1])
+y2 <- quantile(res, probs[2])
+
+slope <- (y2-y1)/(x2-x1)  ## observed slope between quantiles
+int <- y1-slope*x1  ## intercept
+
+
+Y<-as.numeric(qqnorm(res,plot.it = F)$y)
+X<-as.numeric(qqnorm(res,plot.it = F)$x)
+valores.line<-int+slope*X
+ 
+#plot(X,Y);lines(X,valores.line,type="l")
+
+puntos<-data.frame(X,Y,valores.line)
+
+QQPLOT<-highchart() %>%
+     hc_add_series_scatter(x = puntos$X, y = puntos$Y)%>%
+     hc_add_series_scatter(x = puntos$X, y = puntos$valores.line)%>% 
+  hc_title(text = "QQ Plot de normalidad de residuos estandarizados",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>% 
+  hc_yAxis(title = list(text = "Cuantiles")) %>% 
+  hc_xAxis(title = list(text = "Cuantiles Teóricos"))  %>% 
+  hc_legend(enabled = FALSE) %>% 
+  hc_size(height = 250,width = 300)
+
+
+
+
+
+acf.qq<-hw_grid(acf.res,
+        QQPLOT, ncol = 2,rowheight = 250)
+
+
+#Ljung Box
+
+pvalues<-rep(0,36)
+for (i in 1:36){
+  pvalues[i]<-Box.test(res,type="Ljung",lag=i)$ p.value
+}
+
+pvalues<-pvalues[-1]
+
+pv.gf<-data.frame(pvalues,lags=c(2:36))
+
+LJUNG.BOX<-highchart() %>%
+  hc_add_series_scatter(x = pv.gf$lags, y = pv.gf$pvalues)%>%
+  hc_title(text = "P values estadístico Ljung Box",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>% 
+  hc_yAxis(title = list(text = "p value"),min=0,max=1,
+          plotBands  = list(
+             list(from = 0.048, to = 0.052, color = "darkblue"))) %>% 
+  hc_xAxis(title = list(text = "Rezago"))  %>% 
+  hc_legend(enabled = FALSE)%>% 
+  hc_size(height=210)
+
+
+
+
+res.esta
+acf.qq
+LJUNG.BOX
+
+
+```
+
+
+```{r,comment="",fig.align='center'}
+
+hchart(ts.train.serie2,name="Transferencias",color="darkturquoise") %>% 
+  hc_add_series(name = "Estimación",fitted(mod.arima.int2), color="greenyellow")%>% 
+  hc_title(text = "Gráfico 10 <br> Transferencias corrientes y estimación por modelo ARIMA(0,1,1)(0,1,1)12 \n con intervenciones de  Enero 2007 a Junio 2016 \n (millones)",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 800,height=600)
+
+```
+
+
+#### Red Neuronal
+
+Red Neuronal
+
+```{r, message=FALSE, comment="",warning=FALSE,fig.width=10}
+devtools::source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+
+x<-data.frame(m3.x1,m3.x2,m3.x3,impulso)       
+ 
+(mod.red <- nnetar(ts.train.serie2,lambda=BoxCox.lambda(ts.train.serie2)))
+
+```
+
+Red Neuronal con intervenciones
+
+```{r, message=FALSE, comment="",warning=FALSE,fig.width=10}
+(mod.red.int <- nnetar(ts.train.serie2,lambda=BoxCox.lambda(ts.train.serie2),xreg=x[1:114,]))
+```
+
+Visualización de ambos modelos de redes neuronales
+
+```{r, message=FALSE, comment="",warning=FALSE,fig.width=10}
+layout(matrix(c(1,2,2), nrow = 1, ncol = 3, byrow = TRUE))
+
+wts1<-mod.red$model[[1]]$wts
+struct1<-mod.red$model[[1]]$n
+
+plot.nnet(wts1,struct=struct1,pos.col='greenyellow',neg.col='grey',alpha.val=0.43,rel.rsc=5,circle.col='cadetblue',circle.cex=5,cex=1)
+
+wts1<-mod.red.int$model[[1]]$wts
+struct1<-mod.red.int$model[[1]]$n
+
+plot.nnet(wts1,struct=struct1,pos.col='greenyellow',neg.col='grey',alpha.val=0.43,rel.rsc=5,circle.col='cadetblue',circle.cex=5,cex=1)
+```
+
+
+
+```{r,comment="", warning=FALSE, message=FALSE,echo=FALSE}
+
+modelo1<-round(accuracy(mod.red)[c(2,3,5)],3)
+modelo2<-round(accuracy(mod.red.int)[c(2,3,5)],3)
+
+cuadro<-rbind(Medida = c("RSME","MAE","MAPE"),
+           modelo1,modelo2)
+
+colnames(cuadro)<-cuadro[1,]
+cuadro<- cuadro[-1,]
+
+data.frame(cuadro)%>% 
+  kable( escape = F,"html", align = c('r','r','r','r','r','r'), background = "white") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, font_size = 15) %>%
+  column_spec(1, width = "3em", bold = T, color = "gray34") %>%
+  add_header_above(c("Comparación de modelos de red neuronal"=4)) %>% 
+  footnote(general = "Elaboración con datos de Banco Improsa 2010 a 2018",
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+```
+
+```{r,include=FALSE}
+red1<-hchart(ts.train.serie2,name="Transferencias",color="darkturquoise") %>% 
+  hc_add_series(name = "Estimación",fitted(mod.red), color="greenyellow")%>% 
+  hc_title(text = "Modelo NNAR(1,1,2)[12]",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 600,height=400)
+
+red2<-hchart(ts.train.serie2,name="Transferencias",color="darkturquoise") %>% 
+  hc_add_series(name = "Estimación",fitted(mod.red.int), color="greenyellow")%>% 
+  hc_title(text = "Modelo NNAR(1,1,6)[12] con intervenciones",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 600,height=400)
+
+
+TITULO<-hchart(serie2,color="white",showInLegend = FALSE)%>% 
+  hc_title(text = "Modelos Redes Neuronales",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_size(width = 500, height = 80)
+
+hw_grid(TITULO,
+        red1,
+          red2, ncol = 1)
+
+```
+
+```{r,comment="",fig.align='center'}
+
+hchart(ts.train.serie2,name="Transferencias",color="darkturquoise") %>% 
+  hc_add_series(name = "Estimación",fitted(mod.red.int), color="greenyellow")%>% 
+  hc_title(text = "Gráfico 9 <br> Transferencias corrientes y estimación por modelo NNAR(2,1,4)[12] \n con intervenciones de  Enero 2007 a Junio 2016 \n (millones)",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}")) %>%
+      hc_chart(
+        zoomType = "xy"
+      )%>% 
+  hc_size(width = 800,height=600)
+
+```
+
+#### Comparación de modelos  
+
+
+```{r,message=FALSE,warning=FALSE}
+REGRESION<-round(c(accuracy(regr)[c(2,3,5)],CV(regr)[c(2,4)]),3)
+
+ETS.MAM<-round(c(accuracy(MAM)[c(2,3,5)],MAM$aic,MAM$bic),3)
+
+ARIMA<-round(c(accuracy(mod.arima)[c(2,3,5)],mod.arima$aic,mod.arima$bic),3)
+
+ARIMA.INT<-round(c(accuracy(mod.arima.int2)[c(2,3,5)],mod.arima.int2$aic,mod.arima.int2$bic),3)
+
+RED<-round(c(accuracy(mod.red.int)[c(2,3,5)],0,0),3)
+
+
+cuadro<-rbind(Medida = c("RSME","MAE","MAPE","AIC","BIC"),
+           REGRESION,ETS.MAM,ARIMA,ARIMA.INT,RED)
+
+colnames(cuadro)<-cuadro[1,]
+cuadro<- cuadro[-1,]
+
+data.frame(cuadro)%>% 
+  kable( escape = F,"html", align = c('r','r','r','r','r','r'), background = "white") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, font_size = 15) %>%
+  column_spec(1, width = "3em", bold = T, color = "gray34") %>%
+  add_header_above(c("Medidas de rendimiento de la \n parte de entrenamiento"=6)) %>% 
+  footnote(general = fuente,
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+
+
+
+
+```
+
+```{r, message=FALSE,warning=FALSE}
+
+regr1 <- forecast(regr, h=24)
+
+REGRESION<-round(accuracy(regr1, ts.test.serie2)[2,c(2,3,5)],1)
+
+#--------------------------------------------------------------------#
+f.ETS.MAM<-forecast(MAM, h=24)
+
+ETS.MAM<-round(accuracy(f.ETS.MAM, ts.test.serie2)[2,c(2,3,5)],1)
+#--------------------------------------------------------------------#
+
+f.arima<-forecast(mod.arima, h=24)
+
+ARIMA<-round(accuracy(f.arima, ts.test.serie2)[2,c(2,3,5)],1)
+
+#--------------------------------------------------------------------#
+x<-data.frame(m3.x1,m3.x2,m3.x3,impulso)      
+  
+
+f.arima.int<-forecast(mod.arima.int2, h=24,xreg = x[115:138,])
+
+ARIMA.INT<-round(accuracy(f.arima.int, ts.test.serie2)[2,c(2,3,5)],1)
+
+#--------------------------------------------------------------------#
+
+f.mod.red.int <- forecast(mod.red.int, h=24,xreg = x[115:138,])
+
+RED<-round(accuracy(f.mod.red.int, ts.test.serie2)[2,c(2,3,5)],1)
+
+
+cuadro<-rbind(Medida = c("RSME","MAE","MAPE"),
+           REGRESION,ETS.MAM,ARIMA,ARIMA.INT,RED)
+
+colnames(cuadro)<-cuadro[1,]
+cuadro<- cuadro[-1,]
+
+data.frame(cuadro)%>% 
+  kable( escape = F,"html", align = c('r','r','r','r','r','r'), background = "white") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, font_size = 15) %>%
+  column_spec(1, width = "3em", bold = T, color = "gray34") %>%
+  add_header_above(c("Medidas de rendimiento de la \n parte de validación"=4)) %>% 
+  footnote(general = fuente,
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+
+
+```
+
+
+
+
+#### Pronósticos
+
+```{r,fig.align='center',warning=FALSE}
+
+modelo.final1 <- tslm(serie2 ~ trend+season)
+
+modelo.final2 <- ets(serie2,  model ="MAM",damped = TRUE)
+
+modelo.final3 <- Arima(serie2, order=c(1,1,1), seasonal=c(0,1,1))
+
+x<-data.frame(m3.x1,m3.x2,m3.x3,impulso)    
+
+modelo.final4 <- Arima(serie2, order=c(1,1,1), seasonal=c(0,1,1), 
+                        xreg = x , 
+                        include.mean = TRUE)
+
+modelo.final5 <- nnetar(serie2,lambda=0,size = 8,decay=0.5, maxit=150,xreg=x)
+
+impulso<-c(rep(0,24))
+m3.x1<-c(rep(0,24))
+m3.x2<-c(rep(0,24))
+m3.x3<-c(rep(1,24))
+
+x.new<-data.frame(m3.x1,m3.x2,m3.x3,impulso)    
+
+
+x1 <- forecast(modelo.final1, h = 24)
+x2 <- forecast(modelo.final2, h = 24)
+x3 <- forecast(modelo.final3, h = 24)
+x4 <- forecast(modelo.final4, h = 24,xreg =  x.new, newxreg=x)
+x5 <- forecast(modelo.final5, h=24,xreg =  x.new, PI=TRUE)
+
+X1<-hchart(x1)%>% 
+  hc_add_series(name = "Estimación",fitted(modelo.final1), color="greenyellow")%>% 
+  hc_title(text = "Regresión longitudinal",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 600,height=300)%>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>%
+  hc_chart(
+        zoomType = "xy"
+      )
+
+X2<-hchart(x2)%>% 
+  hc_add_series(name = "Estimación",fitted(modelo.final2), color="greenyellow")%>% 
+  hc_title(text = "Holt Winters con errores multiplicativos",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 600,height=300)%>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>%
+  hc_chart(
+        zoomType = "xy"
+      )
+
+X3<-hchart(x3)%>% 
+  hc_add_series(name = "Estimación",fitted(modelo.final3), color="greenyellow")%>% 
+  hc_title(text = "ARIMA(1,1,1)(0,1,1)12",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 600,height=300)%>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>%
+  hc_chart(
+        zoomType = "xy"
+      )
+
+
+X4<-hchart(x4)%>% 
+  hc_add_series(name = "Estimación",fitted(modelo.final4), color="greenyellow")%>% 
+  hc_title(text = "ARIMA(1,1,1)(0,1,1)12 con intervenciones",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 600,height=300)%>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>%
+  hc_chart(
+        zoomType = "xy"
+      )
+
+X5<-hchart(x5)%>% 
+  hc_add_series(name = "Estimación",fitted(modelo.final5), color="greenyellow")%>% 
+  hc_title(text = "Red Neuronal NNAR(2,1,4)12 con intervenciones",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 600,height=300)%>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>%
+  hc_chart(
+        zoomType = "xy"
+      )
+
+TITULO<-hchart(serie2,color="white",showInLegend = FALSE)%>% 
+  hc_title(text = "Pronósticos tres mejores modelos",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_size(width = 500, height = 50)
+
+hw_grid(TITULO,
+        X1,
+         X3,
+          X4,ncol = 1)
+
+```
+
+#### Pronóstico Final
+
+```{r,fig.align='center',message=FALSE,warning=FALSE}
+ipc<-ts(transferencias$ipc, start = c(2007, 1), end = c(2018, 6), frequency = 12)
+mod.ipc <- tslm(ipc ~ trend+season)
+
+f.ipc <- forecast(mod.ipc, h = 24)
+
+fiited.final<-(fitted(modelo.final4)*fitted(mod.ipc))/100
+serie.original<-ts(transferencias$transferencias, start = c(2007, 1), end = c(2018, 6), frequency = 12)
+
+prono.mean<-(x4$mean*f.ipc$mean)/100
+prono.lower<-(x4$lower[,2]*f.ipc$lower[,2])/100
+prono.upper<-(x4$upper[,2]*f.ipc$upper[,2])/100
+
+intervalos<-list_parse2(data.frame(date=datetime_to_timestamp(seq(as.Date("2018/07/01"), as.Date("2020/06/30"), by = "month"))
+                                   ,prono.lower,prono.upper))
+
+hchart(serie.original,name = "Tranferencias")%>% 
+  hc_add_series(name = "Estimación",fiited.final, color="greenyellow")%>% 
+  hc_add_series(data = intervalos, type = "arearange",color="lightgrey",name="Intervalo 95%")%>%
+  hc_add_series(name = "Pronóstico",prono.mean, color="grey")%>% 
+  
+  hc_title(text = "Gráfico 10 <br> Pronóstico de transferencias corrientes por modelo ARIMA \n con intervenciones de  Enero 2007 a Junio 2020 \n (millones)",
+           margin = 20, align = "center",
+           style = list(color = "#black", useHTML = TRUE, fontWeight = "bold")) %>%
+  hc_subtitle(text = "Millones de colones",
+              align = "center")%>% 
+  hc_yAxis(title = list(text = "Colones"),
+           labels = list(format = "{value}"))%>% 
+  hc_size(width = 800,height=600)%>% 
+  hc_tooltip(crosshairs = T,valueDecimals = 1)%>%
+  hc_chart(
+        zoomType = "xy"
+      )
+
+x <- forecast(modelo.final4, h = 24,xreg =  x.new, newxreg=x,level = 95)
+
+x%>% 
+kable(format = "html" )%>%
+  kable_styling(bootstrap_options = "striped", full_width = F)%>%
+  add_header_above(c("Pronóstico de transferencias corrientes por modelo ARIMA(1,1,1)(0,1,1)[12] \n con intervenciones de  Julio 2018 a Junio 2020"= 4)) %>%
+  footnote(general = fuente,
+           general_title = "Fuente: ", 
+           footnote_as_chunk = T)
+```
+
+## Conclusiones y Discusión
+
+
+
+
+
+

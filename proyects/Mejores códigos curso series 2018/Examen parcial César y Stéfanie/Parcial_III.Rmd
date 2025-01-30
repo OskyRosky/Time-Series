@@ -1,0 +1,854 @@
+---
+title: "Examen Parcial III"
+author:
+  - name: César Gamboa Sanabria - Stefany Matarrita Muñoz
+    affiliation: Universidad de Costa Rica
+header-includes:  \usepackage[spanish]{babel}
+bibliography: mybibfile.bib
+output: rticles::elsevier_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache=TRUE, 
+                      warning = FALSE, message = FALSE)
+```
+
+```{r, results='hide'}
+load("Funciones.RData")
+
+paquetes <- c("tidyr", "lubridate", "ggplot2", "ggpmisc",
+              "ggseas", "readxl", "astsa", "forecast", 
+              "formattable", "gridExtra", "dplyr")
+
+requeridos(paquetes)
+```
+
+# Preguntas teóricas
+
+##1.
+
+En el curso y en diversos textos / artículos se presentan las redes neuronales como una técnica no paramétrica. Explique por qué esto no puede ser cierto.
+
+La estadística parámetrica hace supuestos sobre las distribuciones de las variables, es decir parte del supuesto que el comportamiento de las variables sigue una función de probabilidad en particular. Si se asume que la función de activación es una función probabilística, por definición las redes neuronales son una técnica paramétrica.
+
+
+##2. 
+
+
+- Cantidad de entradas y salidas: Los nodos de entrada se refieren a las variables que le dan la información a la red, mientras que los nodos de salida se refieren a las estimaciones realizadas por la red.
+
+- Cantidad de capas ocultas: las capas ocultas son las que realizan el procesamiento de la información mediante el aprendizajes de los nodos de entrada, para luego enviarlas a los nodos de salida.
+
+- Función de red/propagación asociada a cada nodo: Esta función se encarga de ponderar las entradas con los pesos sinápticos, para ello existen diferentes funciones como lo es la función Base Lineal o radial.
+
+- Función de activación de cada neurona: esta función se encarga  de recibir como insumo los valores de la función red, para así, calcular el estado de activación de la neuronal, y propagar la información.Entre las funciones de activación se encuentra la Sigmoide, Tangente Hipérbolica,Identidad...
+
+- Interconexión: se refiere a la forma en que se producen las conexiones entre las diferentes capas de neuronas, por ejemplo puede ser que las salidas de los nodos de una capa estén conectados con todos los nodos de una capa, o solo con un grupo de nodos.
+
+- La dirección que sigue la información: es la forma en la que fluye la información dentro de la red, puede ser que siempre sea hacia adelante, finalizando en la capa de salida  o hacia atrás (Redes de alimentación hacia adelante o atrás respectivamente), inclusive puede que la información se mueva entre neuronas de la misma capa (Redes de alimentación lateral).
+
+- Datos de entrenamiento y validación: el conjunto de datos de entrenamiento es con el que se ajustan los pesos sinápticos para capturar la información que se presenta (aprendizaje), mientras que el conjunto de validación verifica si realmente el modelo entrega resultados aceptables al presentar los patrones de los datos.
+
+
+##3. 
+
+La función de agregación o función de red de cada nodo, es la que agrega las entradas de las neuronas y los pesos sinápticos en un solo valor. Una función de red es la Función Base Lineal (FBL), cuya representación matemática para una neurona j con n entradas, viene dada por:
+
+
+\begin{equation}
+\begin{split}
+& f(x,W_j) = \sum\limits_{i=1}^n x_iw_{ij} 
+\end{split}
+\end{equation}
+
+donde, X es el véctor de entradas y $W_j$ es el véctor de pesos sinápticos e **i** es el índice que identifica a cada entrada.
+
+
+##4.  
+
+Es la función que define la salida de la neurona dado las entradas que recibió, la salida se usa como entrada para el siguiente nodo, y así sucesivamente hasta que se encuentre una solución. Los valores de salida están en el rango de 0 a 1 sin embargo esto depende de cuál función de activación se seleccione.
+
+\begin{equation}
+\begin{split}
+& g(x) = g(f(x,W_j))
+\end{split}
+\end{equation}
+
+CORREGIR EQN
+
+
+##5. 
+
+La contribución de una entrada de las neurona depende en gran medida de su variabilidad relativa respecto a otras entradas, a mayor variabilidad mayor importancia. Entonces si una de las entradas tiene un rango de 0 a 1, mientras que la otra tiene un rango de 0 a 10000, entonces la contribución de la primera va a ser opacada por la segunda, a pesar de que tenga mayor variablidad. Por ello es esencial re escalar las entradas, para que la variabilidad sea un reflejo de la importancia de la variable y así poder capturar la información relevante de las entradas.
+
+
+El véctor gradiente evaluado en un punto x del dominio de una función f(x)  indica la dirección en la cual el campo f varía más rápidamente y su módulo representa el ritmo de variación de f en la dirección de dicho vector gradiente. Dada la definición anterior, si se toma f como la función red, lo que se busca es encontrar el punto donde f varía más, bajo este objetivo, si se reescala se logrará más rápido que la función encuentre el campo vectorial donde tendrá mayor variabilidad, pues solo se estará tomando la información relevante. Se puede concluir entonces que normalizar hace que el entrenamiento sea más rápido y reduce las posiblidades de estancarse en un óptimo local.
+
+# Adecuación de la red    
+
+```{r}
+#x <- arima.sim(n=1000, list(order=c(1,0,1), ar=.9, ma=-.8))+100
+#mean(x)
+#Arima(x, order=c(1,0,1))
+l <- list()
+j <- 1
+for(i in c(50, 100, 200, 500, 1000)){
+  set.seed(11282018)
+  l[[j]] <- arima.sim(n=i, list(order=c(1,0,1), ar=.9, ma=-.8))+100
+  j <- j+1
+}
+
+funcion1 <- function(datos){
+  pos <- floor(.90*length(datos))
+  training <- ts(datos[1:pos], start = 1, end = pos)
+  testing <- ts(datos[(pos+1):length(datos)], start = pos+1, end=length(datos))
+  mod <- nnetar(training)
+  data.frame(Modelo=c(paste("T=", length(datos), sep=""), paste("T=", length(datos), " Validacion", sep="")),
+                             AIC=c(0, NA), AICc=c(0, NA), BIC=c(0, NA),
+                             round(accuracy(forecast(mod, h=24), testing), 4), row.names = NULL) %>% 
+  select(Modelo, AIC, AICc, BIC, MAE, MAPE, RMSE, MASE)
+}
+
+#tabla(do.call("rbind", lapply(l, funcion1)), "entrenamiento")
+#tabla(do.call("rbind", lapply(l, funcion1)), "validacion")
+#tabla.latex(do.call("rbind", lapply(l, funcion1)))
+```
+
+\begin{tabular}{lllll}
+\toprule
+Modelo & MAE & MAPE & RMSE & MASE\\
+\midrule
+T=50 & \textcolor{black}{0.8409} & \textcolor{black}{0.8444} & \textcolor{black}{1.1005} & \textcolor{black}{0.6584}\\
+T=50 Validacion & \textcolor{black}{0.9998} & \textcolor{black}{1.01} & \textcolor{black}{1.2839} & \textcolor{black}{0.7827}\\
+T=100 & \textcolor{black}{0.8192} & \textcolor{black}{0.8219} & \textcolor{black}{1.0958} & \textcolor{red}{0.6264}\\
+T=100 Validacion & \textcolor{black}{1.044} & \textcolor{black}{1.031} & \textcolor{black}{1.2667} & \textcolor{black}{0.7982}\\
+T=200 & \textcolor{black}{0.8272} & \textcolor{black}{0.8283} & \textcolor{black}{1.0692} & \textcolor{black}{0.7167}\\
+T=200 Validacion & \textcolor{black}{0.8231} & \textcolor{black}{0.8316} & \textcolor{black}{1.0635} & \textcolor{black}{0.7132}\\
+T=500 & \textcolor{black}{0.8097} & \textcolor{black}{0.8116} & \textcolor{black}{1.0239} & \textcolor{black}{0.7245}\\
+T=500 Validacion & \textcolor{blue}{0.6166} & \textcolor{blue}{0.6183} & \textcolor{black}{0.8078} & \textcolor{blue}{0.5517}\\
+T=1000 & \textcolor{red}{0.7712} & \textcolor{red}{0.7726} & \textcolor{red}{0.963} & \textcolor{black}{0.7072}\\
+T=1000 Validacion & \textcolor{black}{0.6949} & \textcolor{black}{0.6931} & \textcolor{blue}{0.7837} & \textcolor{black}{0.6372}\\
+\bottomrule
+\end{tabular}
+
+
+Al simular el proceso, las medidas de rendimiento son mejores con *T=1000* para el set de entrenamiento, mientras que en el set de validación dichas medidas son mejorescon *T=500* con excepción del RMSE, que es mejor cuando *T=1000*. En términos generales las medidas de rendimiento parecen disminuir conforme se tienen más periodos.
+
+
+# Preguntas prácticas   
+
+## a    
+
+Son erogaciones  para financiar fundamentalmente gasto corriente, destinados a personas, entes y órganos del sector público, privado y externo, con el fin de satisfacer necesidades públicas de diversa índole, sin que exista una contraprestación de bienes, servicios o derechos  a favor de quien transfiere los recursos.  
+
+## b    
+
+```{r}
+base <- read_excel("Datos.xlsx") #%>% 
+  #gather(año, nacimientos, -mes) %>% 
+  #unite(fecha, año, mes, sep="-") %>% 
+  #mutate(fecha=ymd(fecha),
+   #      año=year(fecha)) #%>% 
+  #merge(., proyecciones, by="año") %>% 
+  #mutate(nacimientos=nacimientos/poblacion*1000) %>% 
+  #select(-c(año, nacimientos, poblacion))
+
+TS <- ts(base$transferencias, start = c(2007, 1), end = c(2018, 6), frequency = 12)
+```
+
+```{r}
+#particion de la serie 1
+train1 <- filter(base, ymd(fecha)<="2016-06-01")
+train1 <- ts(train1$transferencias, start=c(2007, 1), frequency = 12)
+test1 <- filter(base, ymd(fecha)>="2016-07-01")
+test1 <- ts(test1$transferencias, start=c(2016, 7), frequency = 12)
+train.serie1 <- window(train1, c(2007, 1))
+test.serie1 <- window(test1, c(2016, 7))
+serie.completa <- window(TS, start=2007)
+
+#particion de la serie 2
+train2 <- filter(base, ymd(fecha)<="2012-09-01")
+train2 <- ts(train2$transferencias, start=c(2007, 1), frequency = 12)
+test2 <- filter(base, ymd(fecha)>="2012-10-01")
+test2 <- ts(test2$transferencias, start=c(2012, 10), frequency = 12)
+train.serie2 <- window(train2, c(2007, 1))
+test.serie2 <- window(test2, c(2012, 10))
+```
+
+```{r}
+ggplot(TS)+
+  geom_line(color = "#00AFBB", size = 1.3) +
+  stat_smooth(color = "#FC4E07", fill = "#FC4E07",
+              method = "loess")+
+  geom_vline(xintercept = 2000.6, linetype="dashed", color = "red")+
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 1: Transferencias corrientes en el periodo 2007 - 2018") +
+  labs(caption="Fuente: SIGAF",
+       y="Transferencias corrientes",
+       x="Año") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) +
+  #ylim(7,12) +
+  scale_x_discrete(expand = c(0,0), limits=c(2007, 2012, 2018))+
+  scale_y_continuous(labels = comma)
+```
+
+En el gráfico 1, al hacer un suavizamiento Loess puede observarse la endencia creciente a lo largo de todo el periodo
+
+
+```{r}
+base %>% 
+  group_by(año=year(fecha), mes=month(fecha, label = TRUE, abbr=FALSE)) %>% 
+  summarise(transferencias) %>% 
+  ggplot(., aes(x=año, y=transferencias)) +
+  facet_wrap(.~mes, ncol=3) +
+  geom_line(color = "#00AFBB", size = 1.3) +
+  stat_peaks(colour = "red") +
+  stat_peaks(geom = "text", colour = "red", 
+             vjust = -0.5) +
+  stat_valleys(colour = "blue") +
+  stat_valleys(geom = "text", colour = "blue", angle = 20,
+               vjust = 0.1, hjust = 1) +
+  theme_minimal() +
+  theme(text = element_text(size=13),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 2: Transferencias corrientes en el periodo 2007 - 2018") +
+  labs(caption="Fuente: SIGAF",
+       y="Transferencias corrientes",
+       x="Año") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) +
+  #ylim(7, 14) +
+  scale_x_discrete(expand = c(0,0), limits=c(2005, 2010, 2015))+
+  scale_y_continuous(labels = comma)
+```
+
+El gráfico 2 muestra cómo hay un crecimiento sostenido de las transferencias corrientes durante todo el periodo, este aumento se da de una manera casi constante. Los cambios más notables se dan en Noviembre y Diciembre, especialmente en este último mes, pues incluso la tasa de cambio es más elevada.
+
+
+```{r}
+base %>% 
+  mutate(transferencias=BoxCox(transferencias, lambda=1)) %>% 
+ggsdc(., aes(x = fecha, y = transferencias),
+         method = "stl", s.window = 7, frequency = 12, type="multiplicative",
+         facet.titles = c("Serie Original", "Tendencia", 
+                          "Estacionalidad", "Aleatoria")) +
+      geom_line(color = "#00AFBB", size = 0.9) +
+  labs(x = "", y = "") +
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 3: Descomposición de la serie de transacciones\ncorrientes en el periodo 2007 - 2018") +
+  labs(caption="Fuente: SIGAF") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) +
+  scale_x_discrete(expand = c(0,0))
+```
+
+En el gráfico 3 se muestra la descomposición de la serie en sus distintos componentes. Pueden observarse, además de un crecimiento a lo largo del tiempo, los picos y las caídas en la parte estacional. El componente aleatorio muestra indicios de que la varaibilidad de la serie no es homogénea, sino que cambia conforme pasa el tiempo, pues durante un tiempo se mantuvo relativamente estable pero luego presenta algunos cambios.
+
+## c.   
+
+```{r, eval=FALSE}
+load("C:/Users/Dell/OneDrive/Academico/Proyectos/GitHub/Academico/Cursos/SP-1633 Series Cronológicas/Examenes/Parcial III/Environment 2.RData")
+medidas3.1 <- subset(arimas1, Modelo == c("ARIMA(4,1,2)(3,1,3)[12] ", "ARIMA(4,1,2)(3,1,3)[12]  Validacion"))
+medidas3.1$Modelo <- factor(medidas3.1$Modelo)
+medidas3.2 <- subset(arimas1, Modelo == c("ARIMA(4,1,0)(4,1,0)[12] ", "ARIMA(4,1,0)(4,1,0)[12]  Validacion"))
+medidas3.2$Modelo <- factor(medidas3.2$Modelo)
+medidas3.3 <- subset(arimas1, Modelo == c("ARIMA(1,1,1)(1,1,0)[12] ", "ARIMA(1,1,1)(1,1,0)[12]  Validacion"))
+medidas3.3$Modelo <- factor(medidas3.3$Modelo)
+medidas3.4 <- subset(arimas1, Modelo == c("ARIMA(0,1,1)(1,1,0)[12] ", "ARIMA(0,1,1)(1,1,0)[12]  Validacion"))
+medidas3.4$Modelo <- factor(medidas3.4$Modelo)
+medidas.finales.arima <- do.call("rbind", list(medidas3.1, medidas3.2, medidas3.3, medidas3.4))
+medidas.finales.arima$Modelo <- factor(medidas.finales.arima$Modelo)
+#tabla(medidas.finales.arima, "entrenamiento")
+#tabla(medidas.finales.arima, "validacion")
+
+#tabla.latex(medidas.finales.arima)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+ARIMA(4,1,2)(3,1,3)[12] & \textcolor{black}{2202.62} & \textcolor{black}{2206.81} & \textcolor{black}{2236.62} & \textcolor{red}{6749.76} & \textcolor{red}{5.27} & \textcolor{red}{10079.53} & \textcolor{red}{0.38}\\
+ARIMA(4,1,2)(3,1,3)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{11505.15} & \textcolor{blue}{4.92} & \textcolor{black}{19332.37} & \textcolor{blue}{0.65}\\
+ARIMA(4,1,0)(4,1,0)[12] & \textcolor{red}{2197.6} & \textcolor{red}{2199.58} & \textcolor{black}{2221.14} & \textcolor{black}{7162.3} & \textcolor{black}{5.52} & \textcolor{black}{10209.75} & \textcolor{black}{0.4}\\
+ARIMA(4,1,0)(4,1,0)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{11795.31} & \textcolor{black}{5.17} & \textcolor{black}{18516.66} & \textcolor{black}{0.66}\\
+ARIMA(1,1,1)(1,1,0)[12] & \textcolor{black}{2199.58} & \textcolor{black}{2199.99} & \textcolor{black}{2210.04} & \textcolor{black}{7670.97} & \textcolor{black}{5.91} & \textcolor{black}{11424.42} & \textcolor{black}{0.43}\\
+ARIMA(1,1,1)(1,1,0)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{11807.03} & \textcolor{black}{5.23} & \textcolor{blue}{17187.26} & \textcolor{black}{0.66}\\
+ARIMA(0,1,1)(1,1,0)[12] & \textcolor{black}{2201.24} & \textcolor{black}{2201.48} & \textcolor{red}{2209.08} & \textcolor{black}{7813.45} & \textcolor{black}{6} & \textcolor{black}{11628.76} & \textcolor{black}{0.44}\\
+ARIMA(0,1,1)(1,1,0)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{11973.34} & \textcolor{black}{5.29} & \textcolor{black}{17315.36} & \textcolor{black}{0.67}\\
+\bottomrule
+\end{tabular}
+
+El cuadro anterior muestra los 4 mejores modelos ARIMA, sien el ARIMA(4,1,2)(3,1,3) el mejor de todos. Ahora, considerando un arima con intervención se tiene:
+
+```{r, results='hide'}
+break_point <- strucchange::breakpoints(TS ~ 1)
+df <- data.frame(cbind(0:5,summary(break_point)$RSS[2,]))
+colnames(df) <- c("Puntos de corte","BIC")
+#sapply(df,class)
+g1 <- ggplot(df,aes(x=`Puntos de corte`,y=BIC))+geom_line()+geom_point()+
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 4: Intervenciones sugeridas") +
+  labs(caption="Fuente: SIGAF",
+       y="BIC",
+       x="Puntos de corte") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) #+
+  #ylim(7,12) +
+  #scale_x_discrete(expand = c(0,0), limits=c(1995, 2005, 2015))
+```
+
+```{r}
+g2 <- autoplot(TS)+
+autolayer(fitted(break_point, breaks = 3))+
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1), legend.position = "none") +
+  ggtitle("") +
+  labs(caption="Fuente: SIGAF",
+       y="Transferencias corrientes",
+       x="Año") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) #+
+  #ylim(7,12) +
+  #scale_x_discrete(expand = c(0,0), limits=c(1995, 2005, 2015))
+```
+
+```{r}
+grid.arrange(g1,g2, top = "")
+```
+
+```{r, eval=FALSE}
+#arimas.int1
+medidas3.1 <- subset(arimas.int1, Modelo == c("Regression with ARIMA(3,1,0)(4,1,0)[12] errors ", "Regression with ARIMA(3,1,0)(4,1,0)[12] errors  Validacion"))
+medidas3.1$Modelo <- factor(medidas3.1$Modelo)
+medidas3.2 <- subset(arimas.int1, Modelo == c("Regression with ARIMA(4,1,0)(0,1,1)[12] errors ", "Regression with ARIMA(4,1,0)(0,1,1)[12] errors  Validacion"))
+medidas3.2$Modelo <- factor(medidas3.2$Modelo)
+medidas3.3 <- subset(arimas.int1, Modelo == c("Regression with ARIMA(1,1,1)(1,1,0)[12] errors ", "Regression with ARIMA(1,1,1)(1,1,0)[12] errors  Validacion"))
+medidas3.3$Modelo <- factor(medidas3.3$Modelo)
+medidas3.4 <- subset(arimas.int1, Modelo == c("Regression with ARIMA(3,1,0)(0,1,0)[12] errors ", "Regression with ARIMA(3,1,0)(0,1,0)[12] errors  Validacion"))
+medidas3.4$Modelo <- factor(medidas3.4$Modelo)
+medidas.finales.arima <- do.call("rbind", list(medidas3.1, medidas3.2, medidas3.3, medidas3.4))
+medidas.finales.arima$Modelo <- factor(medidas.finales.arima$Modelo)
+#tabla(medidas.finales.arima, "entrenamiento")
+#tabla(medidas.finales.arima, "validacion")
+
+#tabla.latex(medidas.finales.arima)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+Regression with ARIMA(3,1,0)(4,1,0)[12] errors & \textcolor{black}{2207.27} & \textcolor{black}{2210.81} & \textcolor{black}{2238.65} & \textcolor{red}{7271.63} & \textcolor{red}{5.6} & \textcolor{red}{10543.48} & \textcolor{red}{0.41}\\
+Regression with ARIMA(3,1,0)(4,1,0)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{11983.18} & \textcolor{blue}{5.33} & \textcolor{black}{18407.49} & \textcolor{blue}{0.67}\\
+Regression with ARIMA(4,1,0)(0,1,1)[12] errors & \textcolor{red}{2203.41} & \textcolor{red}{2205.85} & \textcolor{black}{2229.56} & \textcolor{black}{7368.65} & \textcolor{black}{5.72} & \textcolor{black}{10574.35} & \textcolor{red}{0.41}\\
+Regression with ARIMA(4,1,0)(0,1,1)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{12585.31} & \textcolor{black}{5.4} & \textcolor{black}{20229.82} & \textcolor{black}{0.71}\\
+Regression with ARIMA(1,1,1)(1,1,0)[12] errors & \textcolor{black}{2206.43} & \textcolor{black}{2207.99} & \textcolor{red}{2227.35} & \textcolor{black}{7714.27} & \textcolor{black}{5.96} & \textcolor{black}{11361.38} & \textcolor{black}{0.43}\\
+Regression with ARIMA(1,1,1)(1,1,0)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{12749.13} & \textcolor{black}{5.58} & \textcolor{black}{18032.63} & \textcolor{black}{0.72}\\
+Regression with ARIMA(3,1,0)(0,1,0)[12] errors & \textcolor{black}{2240.85} & \textcolor{black}{2242.41} & \textcolor{black}{2261.77} & \textcolor{black}{9743.24} & \textcolor{black}{7.46} & \textcolor{black}{13754.5} & \textcolor{black}{0.55}\\
+Regression with ARIMA(3,1,0)(0,1,0)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{12950.19} & \textcolor{black}{6.08} & \textcolor{blue}{16718.11} & \textcolor{black}{0.73}\\
+\bottomrule
+\end{tabular}
+
+Al incorporar las intervenciones, el mejor modelo es un ARIMA(3,1,0)(4,1,0), el cual es ligeramente superior al modelo sin intervenciones.
+
+## d.   
+
+```{r, eval=FALSE}
+#El modelo
+k <- nnetar(train.serie1)
+
+#Medidas entrenamiento
+neural.medidas <- data.frame(Modelo=c("NNAR(2,1,2)[12]", "NNAR(2,1,2)[12] Validacion"),
+                             AIC=c(0, NA), AICc=c(0, NA), BIC=c(0, NA),
+                             round(accuracy(forecast(k, h=24), test.serie1), 4), row.names = NULL) %>% 
+  select(Modelo, AIC, AICc, BIC, MAE, MAPE, RMSE, MASE)
+
+#tabla.latex(neural.medidas)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+NNAR(2,1,2)[12] & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{8656.7021} & \textcolor{red}{6.7029} & \textcolor{red}{12487.2732} & \textcolor{red}{0.486}\\
+NNAR(2,1,2)[12] Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{15423.8145} & \textcolor{blue}{6.6621} & \textcolor{blue}{22247.2702} & \textcolor{blue}{0.8659}\\
+\bottomrule
+\end{tabular}
+
+## e.   
+
+```{r, eval=FALSE}
+medidas3.1 <- subset(arimas.int1, Modelo == c("Regression with ARIMA(3,1,0)(4,1,0)[12] errors ", "Regression with ARIMA(3,1,0)(4,1,0)[12] errors  Validacion"))
+medidas3.1$Modelo <- factor(medidas3.1$Modelo)
+
+bas <- do.call("rbind", list(medidas3.1, neural.medidas))
+#tabla.latex(bas)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+Regression with ARIMA(3,1,0)(4,1,0)[12] errors & \textcolor{black}{2207.27} & \textcolor{black}{2210.81} & \textcolor{black}{2238.65} & \textcolor{red}{7271.63} & \textcolor{red}{5.6} & \textcolor{red}{10543.48} & \textcolor{red}{0.41}\\
+Regression with ARIMA(3,1,0)(4,1,0)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{11983.18} & \textcolor{blue}{5.33} & \textcolor{blue}{18407.49} & \textcolor{blue}{0.67}\\
+NNAR(2,1,2)[12] & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{black}{8656.7021} & \textcolor{black}{6.7029} & \textcolor{black}{12487.2732} & \textcolor{black}{0.486}\\
+NNAR(2,1,2)[12] Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{15423.8145} & \textcolor{black}{6.6621} & \textcolor{black}{22247.2702} & \textcolor{black}{0.8659}\\
+\bottomrule
+\end{tabular}
+
+Al comparar las medidas d erendimiento para ambos modelos, los mejores resultados los ofrece el ARIMA con intervención escalonada, tanto en el set de entrenamiento como en el de validación.
+
+## f.   
+
+```{r, results='hide'}
+l1 <- length(seq(ymd("2007-01-01"), ymd("2008-09-01"), by="months"))
+l2 <- length(seq(ymd("2008-10-01"), ymd("2010-07-01"), by="months"))
+l3 <- length(seq(ymd("2010-08-01"), ymd("2012-09-01"), by="months"))
+l4 <- length(seq(ymd("2012-10-01"), ymd("2014-09-01"), by="months"))
+l5 <- length(seq(ymd("2014-10-01"), ymd("2016-08-01"), by="months"))
+l6 <- length(seq(ymd("2016-09-01"), ymd("2018-06-01"), by="months"))
+level <- c(rep(0, l1), rep(1, l2), rep(2, l3), rep(3, l4), rep(4, l5), rep(5, l6))
+dummy1 <- model.matrix(~as.factor(level))[, -1]
+
+#dummy2 <- c(rep(0, length(level)))
+#dummy2[24] <- 1
+```
+
+```{r}
+#modelos finales
+arima <- Arima(serie.completa, c(3,1,0), c(4,1,0), xreg=dummy1, include.mean = TRUE)
+red <- nnetar(serie.completa)
+```
+
+
+```{r}
+basegraf <- data.frame(fecha=seq(ymd("2007-01-01"), ymd("2020-06-01"), by="months"),
+           Original=c(TS, rep(NA, 24)),
+           Arima=c(forecast(arima, h=12, xreg=dummy1)$fitted, forecast(arima, h=12, xreg=dummy1)$mean[1:24]),
+           Red=c(forecast(red, h=24, PI=TRUE)$fitted, forecast(red, h=24, PI=TRUE)$mean),
+           LIarima=c(rep(NA, 138), forecast(arima, h=12, xreg=dummy1)$lower[1:24,2]),
+           LSarima=c(rep(NA, 138), forecast(arima, h=12, xreg=dummy1)$upper[1:24,2]),
+           LIred=c(rep(NA, 138), forecast(red, h=24, PI=TRUE)$lower[,2]),
+           LSred=c(rep(NA, 138), forecast(red, h=24, PI=TRUE)$upper[,2]))  %>% 
+  gather(Serie, numero, -c(fecha, LIarima, LSarima, LIred, LSred)) %>% 
+  mutate(Serie=factor(Serie, levels = c("Original", "Arima", "Red")))
+
+
+```
+
+```{r}
+
+#arima
+garima <- basegraf %>% 
+  filter(Serie %in% c("Original", "Arima")) %>% 
+  ggplot(., aes(x=fecha, y=numero, colour=Serie))+
+  geom_line(size = 0.8)+
+  scale_color_manual(values=c("limegreen", "orangered1"))+
+  geom_ribbon(aes(x=fecha, ymin=LIarima, ymax=LSarima), fill="green", linetype=0, alpha=0.2)+
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 5: Serie original y pronóstico para los siguientes 24 periodos") +
+  labs(caption="Fuente: SIGAF",
+       y="Transferencias corrientes",
+       x="Año") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) +
+  scale_x_date(expand = c(0,0))+
+  scale_y_continuous(expand=c(0, 0),labels = comma)
+
+#arima
+gred <- basegraf %>% 
+  filter(Serie %in% c("Original", "Red")) %>% 
+  ggplot(., aes(x=fecha, y=numero, colour=Serie))+
+  geom_line(size = 0.8)+
+  scale_color_manual(values=c("limegreen", "orangered1"))+
+  geom_ribbon(aes(x=fecha, ymin=LIred, ymax=LSred), fill="green", linetype=0, alpha=0.2)+
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 6: Serie original y pronóstico para los siguientes 24 periodos") +
+  labs(caption="Fuente: SIGAF",
+       y="transferencias corrientes",
+       x="Año") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) +
+  scale_x_date(expand = c(0,0))+
+  scale_y_continuous(expand=c(0, 0),labels = comma)
+#pronosticos <- ggarrange(gregre, gexp, garima, gautoarima, ncol=2, nrow=2)
+#annotate_figure(pronosticos,
+ #               top = text_grob("Gráfico 7: Pronósticos para 2017 según modelo", color = "black", size = 14),
+  #              bottom = text_grob("Fuente: UED-INEC", color = "blue",
+   #                                hjust = 6, x = 1, face = "plain", size = 10)
+    #            )
+```
+
+```{r}
+garima
+```
+
+```{r, eval=FALSE}
+kable(data.frame(forecast(arima, h=24, xreg = dummy1))[1:24,-c(2:3)], "latex", escape = F, booktabs = T, linesep = "")
+```
+
+\begin{tabular}{lrrr}
+\toprule
+  & Pronostico & LI & LS\\
+\midrule
+Jul 2018 & 231705.8 & 205182.0 & 258229.6\\
+Ago 2018 & 212857.6 & 186276.1 & 239439.2\\
+Sep 2018 & 231809.0 & 203497.9 & 260120.1\\
+Oct 2018 & 260464.3 & 230657.8 & 290270.8\\
+Nov 2018 & 221437.9 & 189386.3 & 253489.4\\
+Dic 2018 & 339753.3 & 306816.4 & 372690.3\\
+Ene 2019 & 250333.5 & 215849.1 & 284817.9\\
+Feb 2019 & 224695.0 & 188926.6 & 260463.4\\
+Mar 2019 & 232370.0 & 195286.0 & 269454.0\\
+Abr 2019 & 241965.1 & 203751.5 & 280178.6\\
+May 2019 & 241802.2 & 202357.6 & 281246.8\\
+Jun 2019 & 239195.0 & 198621.4 & 279768.7\\
+Jul 2019 & 239749.8 & 192149.1 & 287350.5\\
+Ago 2019 & 224314.5 & 175563.5 & 273065.5\\
+Sep 2019 & 251903.1 & 200828.3 & 302977.9\\
+Oct 2019 & 280740.6 & 227531.0 & 333950.2\\
+Nov 2019 & 237936.6 & 182265.7 & 293607.5\\
+Dic 2019 & 349345.6 & 291957.3 & 406733.9\\
+Ene 2020 & 270365.7 & 210930.2 & 329801.2\\
+Feb 2020 & 238707.5 & 177399.1 & 300016.0\\
+Mar 2020 & 258311.9 & 195143.7 & 321480.1\\
+Abr 2020 & 249849.4 & 184951.5 & 314747.4\\
+May 2020 & 258460.9 & 191805.2 & 325116.5\\
+Jun 2020 & 250554.7 & 182221.8 & 318887.6\\
+\bottomrule
+\end{tabular}
+
+```{r}
+gred
+```
+
+```{r, eval=FALSE}
+kable(data.frame(forecast(red, h=24, PI=TRUE))[,-c(2:3)], "latex", escape = F, booktabs = T, linesep = "")
+```
+
+\begin{tabular}{lrrr}
+\toprule
+  & Pronostico & LI & LS\\
+\midrule
+Jul 2018 & 206217.6 & 180454.7 & 230535.6\\
+Ago 2018 & 194320.2 & 167230.0 & 218553.5\\
+Sep 2018 & 231019.3 & 205412.2 & 255582.7\\
+Oct 2018 & 276216.2 & 251284.4 & 301403.1\\
+Nov 2018 & 196890.1 & 171952.7 & 220535.8\\
+Dic 2018 & 453303.9 & 420406.2 & 481039.2\\
+Ene 2019 & 251648.2 & 226915.1 & 277404.6\\
+Feb 2019 & 202556.8 & 178854.0 & 226693.8\\
+Mar 2019 & 222969.8 & 199976.8 & 249297.0\\
+Abr 2019 & 236069.2 & 210243.5 & 258775.6\\
+May 2019 & 233176.6 & 208548.7 & 259106.3\\
+Jun 2019 & 229937.8 & 205557.0 & 253602.1\\
+Jul 2019 & 214675.7 & 179994.3 & 252119.0\\
+Ago 2019 & 202516.5 & 168433.9 & 239703.6\\
+Sep 2019 & 249029.0 & 209473.7 & 290124.7\\
+Oct 2019 & 317062.3 & 261131.6 & 375357.1\\
+Nov 2019 & 204350.6 & 172355.0 & 238718.0\\
+Dic 2019 & 526620.8 & 471444.6 & 584038.3\\
+Ene 2020 & 284492.1 & 236858.9 & 354258.4\\
+Feb 2020 & 213817.4 & 182409.9 & 245809.2\\
+Mar 2020 & 227029.1 & 191942.1 & 271222.4\\
+Abr 2020 & 256081.7 & 213542.5 & 297640.7\\
+May 2020 & 249927.2 & 204861.5 & 295491.0\\
+Jun 2020 & 239646.9 & 201712.4 & 285467.0\\
+\bottomrule
+\end{tabular}
+
+
+Si bien el modelo de redes neuronales ofrece un intervalo de confianza más estrecho para el pronóstico, es el ARIMA con intervención el que  ofrece resultados más adecuados en base a los datos de la serie, pues logra captar de mejor manera los picos estacionales y no sobreestima los valores de éstos en el pronóstico.
+
+## g.   
+
+```{r, eval=FALSE}
+medidas3.1 <- subset(arimas2, Modelo == c("ARIMA(2,1,0)(1,1,0)[12] ", "ARIMA(2,1,0)(1,1,0)[12]  Validacion"))
+medidas3.1$Modelo <- factor(medidas3.1$Modelo)
+medidas3.2 <- subset(arimas2, Modelo == c("ARIMA(1,1,0)(1,1,0)[12] ", "ARIMA(1,1,0)(1,1,0)[12]  Validacion"))
+medidas3.2$Modelo <- factor(medidas3.2$Modelo)
+medidas3.3 <- subset(arimas2, Modelo == c("ARIMA(0,1,1)(1,1,0)[12] ", "ARIMA(0,1,1)(1,1,0)[12]  Validacion"))
+medidas3.3$Modelo <- factor(medidas3.3$Modelo)
+medidas3.4 <- subset(arimas2, Modelo == c("ARIMA(3,1,0)(0,1,1)[12] ", "ARIMA(3,1,0)(0,1,1)[12]  Validacion"))
+medidas3.4$Modelo <- factor(medidas3.4$Modelo)
+medidas.finales.arima <- do.call("rbind", list(medidas3.1, medidas3.2, medidas3.3, medidas3.4))
+medidas.finales.arima$Modelo <- factor(medidas.finales.arima$Modelo)
+#tabla(medidas.finales.arima, "entrenamiento")
+#tabla(medidas3.3, "validacion")
+
+#tabla.latex(medidas.finales.arima)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+ARIMA(2,1,0)(1,1,0)[12] & \textcolor{black}{1231.55} & \textcolor{black}{1232.33} & \textcolor{black}{1239.65} & \textcolor{black}{7265.46} & \textcolor{black}{6.82} & \textcolor{black}{11610.05} & \textcolor{black}{0.39}\\
+ARIMA(2,1,0)(1,1,0)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{6852.93} & \textcolor{blue}{4.38} & \textcolor{blue}{9493.5} & \textcolor{blue}{0.37}\\
+ARIMA(1,1,0)(1,1,0)[12] & \textcolor{black}{1233.83} & \textcolor{black}{1234.29} & \textcolor{black}{1239.9} & \textcolor{black}{7626.74} & \textcolor{black}{7.17} & \textcolor{black}{12030.9} & \textcolor{black}{0.41}\\
+ARIMA(1,1,0)(1,1,0)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{7233.35} & \textcolor{black}{4.62} & \textcolor{black}{9763.71} & \textcolor{black}{0.39}\\
+ARIMA(0,1,1)(1,1,0)[12] & \textcolor{black}{1226.53} & \textcolor{black}{1226.99} & \textcolor{black}{1232.6} & \textcolor{black}{6812.13} & \textcolor{black}{6.41} & \textcolor{black}{11352.1} & \textcolor{black}{0.37}\\
+ARIMA(0,1,1)(1,1,0)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{7240.76} & \textcolor{black}{4.55} & \textcolor{black}{9830.19} & \textcolor{black}{0.39}\\
+ARIMA(3,1,0)(0,1,1)[12] & \textcolor{red}{1222.41} & \textcolor{red}{1223.61} & \textcolor{red}{1232.54} & \textcolor{red}{5428.62} & \textcolor{red}{5.14} & \textcolor{red}{9032.2} & \textcolor{red}{0.29}\\
+ARIMA(3,1,0)(0,1,1)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{7298.65} & \textcolor{black}{4.62} & \textcolor{black}{9841.76} & \textcolor{black}{0.39}\\
+\bottomrule
+\end{tabular}
+
+El cuadro anterior muestra los 4 mejores modelos ARIMA, siendo el ARIMA(2,1,0)(1,1,0) el mejor de todos. Ahora, considerando un arima con intervención se tiene:
+
+```{r, eval=FALSE}
+#arimas.int2
+medidas3.1 <- subset(arimas.int2, Modelo == c("Regression with ARIMA(1,1,0)(1,1,0)[12] errors ", "Regression with ARIMA(1,1,0)(1,1,0)[12] errors  Validacion"))
+medidas3.1$Modelo <- factor(medidas3.1$Modelo)
+medidas3.2 <- subset(arimas.int2, Modelo == c("Regression with ARIMA(0,1,0)(2,1,0)[12] errors ", "Regression with ARIMA(0,1,0)(2,1,0)[12] errors  Validacion"))
+medidas3.2$Modelo <- factor(medidas3.2$Modelo)
+medidas3.3 <- subset(arimas.int2, Modelo == c("Regression with ARIMA(0,1,1)(0,1,1)[12] errors ", "Regression with ARIMA(0,1,1)(0,1,1)[12] errors  Validacion"))
+medidas3.3$Modelo <- factor(medidas3.3$Modelo)
+medidas3.4 <- subset(arimas.int2, Modelo == c("Regression with ARIMA(2,1,3)(2,1,0)[12] errors ", "Regression with ARIMA(2,1,3)(2,1,0)[12] errors  Validacion"))
+medidas3.4$Modelo <- factor(medidas3.4$Modelo)
+medidas.finales.arima <- do.call("rbind", list(medidas3.1, medidas3.2, medidas3.3, medidas3.4))
+medidas.finales.arima$Modelo <- factor(medidas.finales.arima$Modelo)
+#tabla(medidas.finales.arima, "entrenamiento")
+#tabla(medidas3.3, "validacion")
+
+#tabla.latex(medidas.finales.arima)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+Regression with ARIMA(1,1,0)(1,1,0)[12] errors & \textcolor{black}{1237.76} & \textcolor{black}{1238.96} & \textcolor{black}{1247.88} & \textcolor{black}{7619.12} & \textcolor{black}{7.16} & \textcolor{black}{12017.59} & \textcolor{black}{0.41}\\
+Regression with ARIMA(1,1,0)(1,1,0)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{9464.26} & \textcolor{blue}{5} & \textcolor{blue}{14010.87} & \textcolor{blue}{0.51}\\
+Regression with ARIMA(0,1,0)(2,1,0)[12] errors & \textcolor{black}{1260.82} & \textcolor{black}{1262.02} & \textcolor{black}{1270.95} & \textcolor{black}{8430.95} & \textcolor{black}{8.15} & \textcolor{black}{14657.34} & \textcolor{black}{0.45}\\
+Regression with ARIMA(0,1,0)(2,1,0)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{10255.76} & \textcolor{black}{5.1} & \textcolor{black}{15878.25} & \textcolor{black}{0.55}\\
+Regression with ARIMA(0,1,1)(0,1,1)[12] errors & \textcolor{red}{1222.24} & \textcolor{red}{1223.44} & \textcolor{red}{1232.36} & \textcolor{red}{5320.64} & \textcolor{red}{5.06} & \textcolor{red}{8982} & \textcolor{red}{0.29}\\
+Regression with ARIMA(0,1,1)(0,1,1)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{10477.89} & \textcolor{black}{5.33} & \textcolor{black}{16239.15} & \textcolor{black}{0.56}\\
+Regression with ARIMA(2,1,3)(2,1,0)[12] errors & \textcolor{black}{1234.26} & \textcolor{black}{1239.15} & \textcolor{black}{1254.51} & \textcolor{black}{6532.67} & \textcolor{black}{6.15} & \textcolor{black}{10537.15} & \textcolor{black}{0.35}\\
+Regression with ARIMA(2,1,3)(2,1,0)[12] errors  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{10670.4} & \textcolor{black}{5.45} & \textcolor{black}{15224.58} & \textcolor{black}{0.57}\\
+\bottomrule
+\end{tabular}
+
+Al incorporar las intervenciones, el mejor modelo es un ARIMA(3,1,0)(4,1,0), el cual es inferior al ARIMA sin intervenciones.
+
+```{r, eval=FALSE}
+#El modelo
+k <- nnetar(train.serie2)
+
+#Medidas entrenamiento
+neural.medidas <- data.frame(Modelo=c("NNAR(2,1,2)[12]", "NNAR(2,1,2)[12] Validacion"),
+                             AIC=c(0, NA), AICc=c(0, NA), BIC=c(0, NA),
+                             round(accuracy(forecast(k, h=24), test.serie2), 4), row.names = NULL) %>% 
+  select(Modelo, AIC, AICc, BIC, MAE, MAPE, RMSE, MASE)
+
+tabla.latex(neural.medidas)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+NNAR(2,1,2)[12] & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{6637.6311} & \textcolor{red}{6.7201} & \textcolor{red}{9201.3872} & \textcolor{red}{0.3559}\\
+NNAR(2,1,2)[12] Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{21474.666} & \textcolor{blue}{13.1651} & \textcolor{blue}{24752.4614} & \textcolor{blue}{1.1514}\\
+\bottomrule
+\end{tabular}
+
+
+```{r, eval=FALSE}
+medidas3.1 <- subset(arimas2, Modelo == c("ARIMA(2,1,0)(1,1,0)[12] ", "ARIMA(2,1,0)(1,1,0)[12]  Validacion"))
+medidas3.1$Modelo <- factor(medidas3.1$Modelo)
+
+bas <- do.call("rbind", list(medidas3.1, neural.medidas))
+#tabla.latex(bas)
+```
+
+\begin{tabular}{llllllll}
+\toprule
+Modelo & AIC & AICc & BIC & MAE & MAPE & RMSE & MASE\\
+\midrule
+ARIMA(2,1,0)(1,1,0)[12] & \textcolor{black}{1231.55} & \textcolor{black}{1232.33} & \textcolor{black}{1239.65} & \textcolor{black}{7265.46} & \textcolor{black}{6.82} & \textcolor{black}{11610.05} & \textcolor{black}{0.39}\\
+ARIMA(2,1,0)(1,1,0)[12]  Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{blue}{6852.93} & \textcolor{blue}{4.38} & \textcolor{blue}{9493.5} & \textcolor{blue}{0.37}\\
+NNAR(2,1,2)[12] & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{6637.6311} & \textcolor{red}{6.7201} & \textcolor{red}{9201.3872} & \textcolor{red}{0.3559}\\
+NNAR(2,1,2)[12] Validacion & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{white}{NA} & \textcolor{black}{21474.666} & \textcolor{black}{13.1651} & \textcolor{black}{24752.4614} & \textcolor{black}{1.1514}\\
+\bottomrule
+\end{tabular}
+
+Los mejores resultados los ofrece el ARIMA sin intervención.
+
+```{r}
+#modelos finales
+arima <- Arima(serie.completa, c(2,1,0), c(1,1,0), include.mean = TRUE)
+red <- nnetar(serie.completa)
+```
+
+
+```{r}
+pron.red <- forecast(red, h=24, PI=TRUE)
+
+basegraf <- data.frame(fecha=seq(ymd("2007-01-01"), ymd("2020-06-01"), by="months"),
+           Original=c(TS, rep(NA, 24)),
+           Arima=c(forecast(arima, h=24)$fitted, forecast(arima, h=24)$mean[1:24]),
+           Red=c(pron.red$fitted, pron.red$mean),
+           LIarima=c(rep(NA, 138), forecast(arima, h=24)$lower[1:24,2]),
+           LSarima=c(rep(NA, 138), forecast(arima, h=24)$upper[1:24,2]),
+           LIred=c(rep(NA, 138), pron.red$lower[,2]),
+           LSred=c(rep(NA, 138), pron.red$upper[,2])) %>%  
+  gather(Serie, numero, -c(fecha, LIarima, LSarima, LIred, LSred)) %>% 
+  mutate(Serie=factor(Serie, levels = c("Original", "Arima", "Red")))
+
+
+```
+
+```{r}
+
+#arima
+garima <- basegraf %>% 
+  filter(Serie %in% c("Original", "Arima")) %>% 
+  ggplot(., aes(x=fecha, y=numero, colour=Serie))+
+  geom_line(size = 0.8)+
+  scale_color_manual(values=c("limegreen", "orangered1"))+
+  geom_ribbon(aes(x=fecha, ymin=LIarima, ymax=LSarima), fill="green", linetype=0, alpha=0.2)+
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 7: Serie original y pronóstico para los siguientes 24 periodos") +
+  labs(caption="Fuente: SIGAF",
+       y="Transferencias corrientes",
+       x="Año") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) +
+  scale_x_date(expand = c(0,0))+
+  scale_y_continuous(expand=c(0, 0),labels = comma)
+
+#arima
+gred <- basegraf %>% 
+  filter(Serie %in% c("Original", "Red")) %>% 
+  ggplot(., aes(x=fecha, y=numero, colour=Serie))+
+  geom_line(size = 0.8)+
+  scale_color_manual(values=c("limegreen", "orangered1"))+
+  geom_ribbon(aes(x=fecha, ymin=LIred, ymax=LSred), fill="green", linetype=0, alpha=0.2)+
+  theme_minimal() +
+  theme(text = element_text(size=9),
+        axis.text.x = element_text(angle=0, hjust=1)) +
+  ggtitle("Gráfico 8: Serie original y pronóstico para los siguientes 24 periodos") +
+  labs(caption="Fuente: SIGAF",
+       y="transferencias corrientes",
+       x="Año") +
+  theme(plot.title = element_text(hjust = 0.5, face="plain"),
+        plot.caption=element_text(hjust=0, vjust=0.5,
+                                  margin=margin(t=1,10,10,10))) +
+  scale_x_date(expand = c(0,0))+
+  scale_y_continuous(expand=c(0, 0),labels = comma)
+#pronosticos <- ggarrange(gregre, gexp, garima, gautoarima, ncol=2, nrow=2)
+#annotate_figure(pronosticos,
+ #               top = text_grob("Gráfico 7: Pronósticos para 2017 según modelo", color = "black", size = 14),
+  #              bottom = text_grob("Fuente: UED-INEC", color = "blue",
+   #                                hjust = 6, x = 1, face = "plain", size = 10)
+    #            )
+```
+
+```{r}
+garima
+```
+
+```{r, eval=FALSE}
+kable(data.frame(forecast(arima, h=24))[,-c(2:3)], "latex", escape = F, booktabs = T, linesep = "")
+```
+
+\begin{tabular}{lrrr}
+\toprule
+  & Pronostico & LI & LS\\
+\midrule
+Jul 2018 & 215899.8 & 187433.5 & 244366.0\\
+Ago 2018 & 203868.0 & 174815.8 & 232920.2\\
+Sep 2018 & 224043.7 & 191598.7 & 256488.6\\
+Oct 2018 & 256243.8 & 220478.0 & 292009.5\\
+Nov 2018 & 211654.2 & 174018.6 & 249289.8\\
+Dic 2018 & 325411.7 & 285196.9 & 365626.5\\
+Ene 2019 & 243461.4 & 201098.9 & 285823.9\\
+Feb 2019 & 211649.6 & 167282.5 & 256016.7\\
+Mar 2019 & 225370.0 & 178973.4 & 271766.5\\
+Abr 2019 & 228907.0 & 180639.6 & 277174.3\\
+May 2019 & 233680.9 & 183590.5 & 283771.3\\
+Jun 2019 & 232813.6 & 180958.7 & 284668.4\\
+Jul 2019 & 226634.0 & 167344.9 & 285923.2\\
+Ago 2019 & 214748.8 & 153198.0 & 276299.6\\
+Sep 2019 & 239847.1 & 174750.6 & 304943.6\\
+Oct 2019 & 274136.1 & 205576.2 & 342696.0\\
+Nov 2019 & 220507.4 & 149168.2 & 291846.5\\
+Dic 2019 & 348269.0 & 273891.5 & 422646.6\\
+Ene 2020 & 258402.5 & 181229.8 & 335575.2\\
+Feb 2020 & 220761.6 & 140909.7 & 300613.5\\
+Mar 2020 & 240228.9 & 157732.8 & 322725.0\\
+Abr 2020 & 244305.4 & 159281.9 & 329329.0\\
+May 2020 & 246984.1 & 159495.5 & 334472.6\\
+Jun 2020 & 246182.7 & 156294.1 & 336071.3\\
+\bottomrule
+\end{tabular}
+
+```{r}
+gred
+```
+
+```{r, eval=FALSE}
+kable(data.frame(forecast(red, h=24, PI=TRUE))[,-c(2:3)], "latex", escape = F, booktabs = T, linesep = "")
+```
+
+\begin{tabular}{lrrr}
+\toprule
+  & Pronostico & LI & LS\\
+\midrule
+Jul 2018 & 208151.1 & 184716.0 & 231586.2\\
+Ago 2018 & 196295.8 & 170944.8 & 220910.8\\
+Sep 2018 & 229664.1 & 203984.9 & 253989.7\\
+Oct 2018 & 279826.2 & 254047.4 & 306130.9\\
+Nov 2018 & 200338.5 & 174915.1 & 223850.8\\
+Dic 2018 & 464661.9 & 438153.0 & 488323.6\\
+Ene 2019 & 262945.8 & 235829.2 & 288485.6\\
+Feb 2019 & 200084.0 & 175071.7 & 223933.3\\
+Mar 2019 & 226522.4 & 202071.5 & 251777.1\\
+Abr 2019 & 234898.8 & 210788.0 & 257741.7\\
+May 2019 & 234022.4 & 209927.5 & 257505.9\\
+Jun 2019 & 232723.1 & 207600.9 & 258274.5\\
+Jul 2019 & 219864.6 & 185469.2 & 258185.9\\
+Ago 2019 & 207229.1 & 173510.2 & 245423.0\\
+Sep 2019 & 246142.0 & 206067.3 & 291737.8\\
+Oct 2019 & 336176.3 & 280195.4 & 405259.9\\
+Nov 2019 & 213982.6 & 181732.6 & 251580.4\\
+Dic 2019 & 577382.2 & 517929.0 & 620146.2\\
+Ene 2020 & 335473.3 & 272149.1 & 406127.6\\
+Feb 2020 & 215040.4 & 179865.9 & 252494.5\\
+Mar 2020 & 237251.2 & 197238.0 & 279896.2\\
+Abr 2020 & 253699.8 & 217269.4 & 297446.3\\
+May 2020 & 251582.7 & 211835.5 & 298879.6\\
+Jun 2020 & 248869.9 & 210722.2 & 297802.9\\
+\bottomrule
+\end{tabular}
+
+
+Al tomar la mitad de los datos para el conjunto de entrenamiento y la otra mitad para validación, nuevamente las redes neuronales ofrecen un intervalo de confianza más estrecho, si embargo el problema de la sobreestimación en el pronóstico persiste. El ARIMA(3,1,0)(4,1,0), que es sin intervención, ofrece un mejor ajuste a los datos históricos y brinda un pronóstico más acorde a lo observado en toda la serie.
+
+## h.   
+
+El ajuste hecho a la base de entrenamiento muestra que la tendencia de las transacciones corrientes han ido aumentando con el tiempo, mismo comportamiento que se espera al realizar el pronóstico. Dada la situación fiscal del país, una intervención en este tipo de transferencias podría reducir aún más el gasto y destinar esas cantidades a necesidades más específicas y requeridas en la actualidad; aunque no es posible reducir las transferencias corrientes a su mínima expresión, sí es posible intervenirla para tener un mayor control fiscal en el país.
