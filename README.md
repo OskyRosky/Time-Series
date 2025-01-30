@@ -1183,7 +1183,7 @@ Refine strategies: adjust business decisions based on updated forecasts and insi
 
 Reporting and decision-making are the bridge between data analysis and real-world impact. By presenting forecasts in a clear, actionable format and linking them to business strategies, time series analysis becomes a powerful tool for driving organizational success. These final steps ensure that the effort invested in the analysis translates into meaningful, data-driven decisions.
 
-
+ ![ut](/ima/ima10.webp)
 
 # V. Time series applications.
 
