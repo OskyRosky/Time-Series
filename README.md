@@ -51,6 +51,14 @@ The repository follows a well-defined time series workflow:
 
 7.  **Learning** 💡
 
+By exploring this repository, you will gain expertise in:
+
+- Understanding the core principles of time series analysis
+- Applying state-of-the-art forecasting models across different domains
+- Using Python and R to prepare, visualize, and model time series data
+- Implementing real-time deployment solutions for forecasting applications
+- Conducting scenario and sensitivity analysis to improve decision-making
+
 8.  **Improvement** 🔩
 
 9.  **Running the Project** ⚙️
