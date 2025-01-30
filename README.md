@@ -22,15 +22,27 @@ The repository leverages Python and R, along with a combination of traditional s
 
 3.  **Features** 🤳🏽
 
-4.  **Process** 👣
+This repository provides a step-by-step methodological framework for conducting time series analysis, including:
 
-5.  **Learning** 💡
+- Understanding Time Series Data: Identifying trends, seasonality, and anomalies
+- Data Collection & Preprocessing: Handling missing values, outliers, and time-dependent transformations
+- Exploratory Data Analysis (EDA): Visualizing trends, autocorrelations, and decomposition
+- Model Selection & Training: Statistical models, ML models, and DL architectures for forecasting
+- Hyperparameter Tuning: Optimizing model performance through cross-validation and validation curves
+- Forecasting & Interpretation: Generating forecasts, confidence intervals, and business insights
+- Scenario & Sensitivity Analysis: Testing robustness under different hypothetical conditions
+- Deployment & Monitoring: Cloud-based deployment, dashboards, and ongoing model evaluation
+- Reporting & Decision-Making: Transforming predictions into actionable business strategies
 
-6.  **Improvement** 🔩
+5.  **Process** 👣
 
-7.  **Running the Project** ⚙️
+6.  **Learning** 💡
 
-8.  **More** 🙌🏽
+7.  **Improvement** 🔩
+
+8.  **Running the Project** ⚙️
+
+9.  **More** 🙌🏽
 
 
 ---------------------------------------------
