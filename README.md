@@ -343,6 +343,8 @@ A predictive analytics platform that includes time series forecasting as part of
 
 These solutions offer a wide range of functionalities from data ingestion to visualization and forecasting, making them suitable for businesses and researchers looking to leverage time series analysis without extensive programming knowledge.
 
+ ![ut](/ima/ima5.jpeg)
+
 # III. Uses of Time Series analysis.
 
 ## 1. Descriptive Analysis
