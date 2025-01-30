@@ -9,6 +9,8 @@
 
 1.  **Intro** 🧳
 
+This repository provides a structured and comprehensive guide to time series analysis and forecasting. It covers key concepts, methodologies, and best practices to understand, analyze, and predict time-dependent data. The repository is designed to be practical, focusing on real-world applications across different industries, from finance and energy to climate science and retail.
+
 2.  **Tech Stack** 🤖
 
 3.  **Features** 🤳🏽
