@@ -100,6 +100,8 @@ For further discussions, contributions, or improvements, feel free to:
 
 ---------------------------------------------
 
+ ![ut](/ima/ima2.png)
+
 # I. Time series
 
 ## 1. What's Time Series
