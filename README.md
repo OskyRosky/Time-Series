@@ -36,13 +36,26 @@ This repository provides a step-by-step methodological framework for conducting 
 
 5.  **Process** 👣
 
-6.  **Learning** 💡
+The repository follows a well-defined time series workflow:
 
-7.  **Improvement** 🔩
+1. Understanding the Data → Define objectives, check stationarity, and identify patterns
+2. Data Collection & Preprocessing → Clean, transform, and structure the data
+3. Exploratory Analysis → Detect trends, seasonality, and anomalies
+4. Model Selection & Training → Fit ARIMA, SARIMA, XGBoost, LSTMs, or other models
+5. Hyperparameter Tuning → Optimize the model for better performance
+6. Forecasting & Interpretation → Generate and evaluate predictions
+7. Scenario & Sensitivity Analysis → Test model robustness under different conditions
+8. Deployment & Monitoring → Deploy in production and track forecast performance
+9. Reporting & Decision-Making → Deliver insights for executive decision-making
 
-8.  **Running the Project** ⚙️
 
-9.  **More** 🙌🏽
+7.  **Learning** 💡
+
+8.  **Improvement** 🔩
+
+9.  **Running the Project** ⚙️
+
+10.  **More** 🙌🏽
 
 
 ---------------------------------------------
