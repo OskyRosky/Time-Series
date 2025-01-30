@@ -13,6 +13,13 @@ This repository provides a structured and comprehensive guide to time series ana
 
 2.  **Tech Stack** 🤖
 
+The repository leverages Python and R, along with a combination of traditional statistical methods, machine learning, and deep learning techniques. The key technologies and libraries used include:
+
+- Python: pandas, numpy, statsmodels, scikit-learn, Prophet, Darts, TensorFlow, PyTorch
+- R: forecast, tseries, prophet, ggplot2, lubridate, fable
+- Deployment Tools: AWS, GCP, Azure, Power BI, Tableau, Streamlit, Dash
+- Data Storage: SQL, NoSQL, Time Series Databases (InfluxDB, TimescaleDB), Cloud Storage
+
 3.  **Features** 🤳🏽
 
 4.  **Process** 👣
