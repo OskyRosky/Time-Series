@@ -207,6 +207,8 @@ Environmental Time Series: Techniques focused on analyzing climate data, air pol
 
 Healthcare Time Series: Specialized approaches for monitoring patient health metrics and predicting disease progression to improve medical interventions.
 
+ ![ut](/ima/ima5.jpg)
+
 # II. Time series tools
 
 ## Python libraries for Time Series analysis
