@@ -1003,6 +1003,8 @@ Scenario analysis: forecasts can be combined with scenario analysis to assess ho
 
 Forecasting and interpretation are the culmination of all preceding steps in the time series analysis process. Beyond producing accurate predictions, the true value lies in presenting these forecasts in a way that incorporates uncertainty and provides actionable insights. Confidence intervals, logical validation, and domain expertise play a central role in ensuring that forecasts are both reliable and practical. Ultimately, this stage transforms data-driven predictions into meaningful decisions and strategies.
 
+ ![ut](/ima/ima9.png)
+
 ## 10. Scenario and sensitivity analysis
 
 Scenario and sensitivity analysis is a valuable extension of time series forecasting that helps assess how robust a model is under different conditions and how sensitive it is to changes in key variables. These methods add strength to the analysis by testing the model’s performance beyond the baseline forecasts, providing insights into potential risks, uncertainties, and alternative outcomes.
