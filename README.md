@@ -167,6 +167,8 @@ Time series analysis is instrumental in identifying outliers and irregular patte
 
 Understanding demand patterns and trends through time series analysis allows organizations to allocate resources more efficiently. This can lead to cost savings, improved service delivery, and better management of supply chains and inventories.
 
+ ![ut](/ima/ima4.jpeg)
+
 ## 3. Categories of Time Series Analysis
 
 ### Traditional Statistical Methods
